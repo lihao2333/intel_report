@@ -1,0 +1,28 @@
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\toprule
+  名称&默认值&功能\\
+\midrule
+content\_image&contents/me.jpg&内容图片路径\\
+style\_image&styles/picasso.jpg&风格图片路径\\
+image\_size&512& 图片缩放规模\\
+backend& clnn& 是否使用opencl作为加速器\\
+gpu& 1& 加速设备Id,如果是cpu则为-1\\
+init\_image& contents/me.jpg& 迭代起始点,我们选择从内容图像开始\\
+proto\_file& models/VGG\_ILSVRC\_19\_layers\_deploy.prototxt\\
+model\_file& models/VGG\_ILSVRC\_19\_layers.caffemodel\\
+content\_weight& 5e0&内容失真的权重\\
+style\_weight& 20&风格失真的权重\\
+content\_layers& relu4\_2&在哪些层后面加内容失真层\\
+style\_layers& relu1\_1,relu2\_1,relu3\_1,relu4\_1,relu5\_1& 在那些层后面加风格失真层\\
+learning\_rate& 1e1 &学习率\\
+num\_iterations& 1000&总共迭代步数\\
+print\_iter& 1& 每隔多少步打印\\
+save\_iter& 1 &每个多少步保存迭代结果\\
+output\_image&output/out.png&输出图像路径\\
+\bottomrule
+\end{tabular}
+\caption{neural-style\_diy 的api接口}
+\label{tbl-abi-neural-style}
+\end{table}

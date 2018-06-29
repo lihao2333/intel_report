@@ -1,0 +1,41 @@
+\section{环境配置与web搭建}
+\subsection{环境配置}
+我们需要的环境配置如表\ref{tbl:environment}所示:
+\addtbl{environment}
+由于环境安装比较复杂，我们基于ncsdk2的dockfile制作了专门的镜像，托管在dockerhub中，名为lihao2333/intel.
+目前版本说明如表\ref{tbl:docker-version}:
+\addtbl{docker-version}
+另外还需要安装intel SDK,我们按照手册上的说明进行了安装，为了方便使用,我们把一些相关的命令进行了封装并且托管在了github\cite{rcClub}上面
+\subsection{网站搭建}
+\subsubsection{文件管理}
+图\ref{fig:file-structure}简略的表示了该项目的文件存储结构,图中名称是为了表述清晰，可能与实际名称不符.一些非核心文件没有表示出来。
+\addfig[0.8]{file-structure.jpg}{fig:file-structure}{文件存储结构}
+其中,fast-neural-sytle和neural-sytle为两个风格迁移的工程目录.
+
+fast-neural-sytle 目录下的models文件夹存放已经训练好的模型,img文件加存放和模型对应的风格图片，用于在web端显示. main.py 为其主执行文件。
+
+neural-sytle 目录下的models文件夹存放基本网络架构--VGG-19模型.main.lua 为其主执行文件。
+
+neural\_web为djagno的根目录，为了能够调用两个风格迁移的主函数，需要将他们软连接到neural\_web下面，如虚线所示。
+
+将media设置为django工程的MEDIA\_ROOT,其下主要有三部分。
+\begin{description}
+  \item{\textbf{img:}}为fast-neural-style下img的软链接，用于最终显示用户选择的风格图像
+  \item{\textbf{way\_img:}}保存生成图片模式下的数据，其下按照用户/时间产生文件夹作为区分，每个子文件夹下保存用户上传的图像数据以及最终的结果数据
+  \item{\textbf{way\_video:}}保存生成视频模式下的数据，其下按照用户/时间产生文件夹作为区分，每个子文件夹下保存用户上传的内容图片，风格图片，迭代过程中产生的结果图片以及最终产生的视频
+\end{description}
+
+\subsubsection{UI界面}
+图\ref{fig:login}所示为登陆界面，在登录后能够看到4个窗口，分别是Create Video，Video gallery，Create Image，Image gallery，如图\ref{fig:main}所示.
+\addfig[0.9]{login.png}{fig:login}{登陆界面}
+\addfig[0.9]{main.png}{fig:main}{主界面}
+
+进入"Create Video"后,用户上传自己的内容图片和风格图片,点击确定即可,如图\ref{fig:gen-video}.用户可以等待也可以关闭界面.
+之后点击"Video gallery"查看产生的视频,并且可以进行下载,如图\ref{fig:show-video}所示.
+\addfig[0.9]{gen-video.png}{fig:gen-video}{创建视频界面}
+\addfig[0.9]{show-video.png}{fig:show-video}{Video gallery界面}
+
+如果想快速生成图片,点击"Create Image",并且上传自己的内容图片并选择一个风格模型,如图\ref{fig:gen-img}所示.
+稍等一会就会自动跳转浏览生成图片并且进行下载,也可以手动点击"Image gallery"进行查看.如图\ref{fig:show-img}所示.
+\addfig[0.9]{gen-img.png}{fig:gen-img}{创建图像界面}
+\addfig[0.9]{show-img.png}{fig:show-img}{查看图像界面}

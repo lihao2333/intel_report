@@ -1,0 +1,19 @@
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\toprule
+  名称     & neural style\cite{neural-style}    & fast neural style\cite{fast-neural-style} \\
+\midrule
+实现方式   & 先确立目标值，再多次迭代逼近  & 先训练模型，再前向传播       \\
+特点     & 时间长，可以输出每次迭代的结果 & 时间短，每种风格必须预训练好模型  \\
+  已有代码版本 &caffe tensorflow torch & caffe tensorflow torch \\
+ % caffe\cite{neural-style-caffe}
+ % tensorflow\cite{neural-style-tensorflow}
+ % torch\cite{neural-style-torch} & 
+ % pytorch\cite{fast-neural-style-pytorch} 
+ % tensorflow\cite{fast-neural-style-tensorflow}   \\
+\bottomrule
+\end{tabular}
+\caption{neural style 发展概况}
+\label{tbl:compare-neural-style}
+\end{table}

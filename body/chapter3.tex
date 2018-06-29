@@ -1,0 +1,42 @@
+\section{neural-sytle产生视频}
+\subsection{代码说明}
+我们的这部分代码是基于github上neural-sytle\cite{neural-style}针对我们的需求进行改写的,现在托管在我们的github\cite{neural-style-diy}上,主要修改体现在如下几点:
+\begin{enumerate}
+  \item 去掉了lbfgs 优化器.改用adam优化器来实现,虽然adam优化器的效果不如lbfgs,但是它在节省内存,节省时间上的优势是我们更需要的.
+  \item 代码重新封装.之前作者的代码是集成在一个函数中,我们将整个函数进行了重写,分为若干个子函数,方便调试和管理.
+  \item 固化模型,节省时间开支.之前每一次都需要加载vgg-19模型,然后修改模型,再进行训练.我们直接将修改后的模型存储下来,用的时候直接调用既可,能够节省一些时间.
+  \item 从内容图像开始迭代.原来的代码是从一副随机图像开始进行迭代的,而我们的需求是以内容图片为主,所以从内容图片开始迭代,这样能够大幅度减少迭代步数
+\end{enumerate}
+\subsection{核心原理}
+该项目自定义了两种失真层,分别是内容失真和图像失真,并且将他们插入到VGG-19线性模型中.插入的方法有很多,我们沿用了作者在论文中提到的方法\cite{article:neural-style}.
+
+如图\ref{fig:neural-style-flow}所示,我们在vgg-19模型的relu1\_1,relu2\_1,relu3\_1,relu4\_1,relu5\_1层的后面添加了风格失真层,在relu4\_2层的后面添加了内容失真层.relu1\_1的意思是vgg-19模型中的第一段卷积块的第一个卷积层后面的激活函数层.vgg-19模型一共有5个卷积块,具体模型可以参考这里\cite{vgg-19}
+
+该代码主要有两种模式. 在capture mode中,将用户的风格图片进行前行传播,在这个过程中每个sytleloss层将风格图片到该层的输出结果作为目标值.再将用户的内容图片进行前向传播,在这个过程中每个contentloss层将其到该层的输出结果作为目标值.
+
+在lossmode中, 将用户的内容图片作为前向输入, 统计其在各个失真层的总输出,然后通过反向传播去更新内容图片的值.
+这就是一次迭代过程, 在我们的参数下,一幅图片大概400步迭代就能够有不错的效果.
+\addfig[0.9]{neural-style-flow.jpg}{fig:neural-style-flow}{neural-style代码的两种模式}
+
+\subsection{主体代码结构}
+这是该项目的主函数部分代码,为了精简,删去了一些细节,并且尽可能的实现友好的封装,完整代码可以从我们的github\cite{neural-style-diy}上查阅
+\addcode[python]{neural-style-main.lua}
+\begin{itemize}
+\item 第二行的setup\_device 用来配置设备是否用fpga加速
+\item 第三行的setup\_images 根据输入的路径提取内容图片和风格图片,并且最相应的图片预处理
+\item 第四行的setup\_network\_1 用来加载VGG-19模型,并且根据输入参数将对应的失真层添加进去然后保存下来.
+\item 第五行的setup\_network\_2 用来进行capture mode下的若干次前向传播,并且记录目标值,为训练做准备
+\item 第六行的train 通过adam优化器进行训练
+\item 第九行是更具输入内容图片的名称对输出图片进行命名,保证二者在同一个目录下. 这是与web端的配合
+\end{itemize}
+其中第四行和第五行是将输出网络存储为本地文件,第六行训练的时候直接从这个文件里提取.
+所以对于相同的输入来说,第四行和第五行只要执行一次就可以了,之后可以注释掉,这样能够大幅度减少调试的时间.
+\subsection{API接口}
+我们修改后的neural-sytle\_diy提供的主要api以及默认值如表\ref{tbl-abi-neural-style}所示
+\addtbl{api-neuralstyle}
+\subsection{django 调用方式}
+用户行为本质上是上传一个包含内容图片和风格图片的post请求,后台接受到post请求后,先将图片与user\_id绑定传入数据库,然后调用neural-sytle\_diy的接口.后台处理代码如下:
+\addcode[python]{views-neural-style.py}
+
+其中第11行代码的func就是在调用neural-sytle,为了方便输入参数,我们直接将命令封装在系统命令中,如下所示. 第一个命令是调用模型，生成每一步的输出结果．第二个函数是通过ffmepg将输出结果合并为一个视频．在每一次展示结果的时候都进行以此视频合成．
+\addcode[python]{func-neural-style.py}
