@@ -33,7 +33,7 @@ The fourth and fifth lines store the output network as a local file, and the six
 So for the same input, the fourth and fifth lines need only be executed once, and can be commented out later, which can greatly reduce the debugging time.
 \subsection{API Interface}
 The main api provided by our modified neural-sytle\_diy and the default values such as the table\ref{tbl-abi-neural-style}
-\addtbl{api-neuralstyle}
+\addtbl{api-neuralstyle_en}
 \subsection{Django call method}
 The user behavior is essentially to upload a post request containing the content image and style image. After receiving the post request in the background, the image is first bound to the database with user\_id, and then the neural-sytle\_diy interface is called. The code is processed in the background. as follows:
 \addcode[python]{views-neural-style.py}

@@ -1,31 +1,24 @@
-\contentsline {section}{\numberline {第1章}绪论}{1}{section.1}
-\contentsline {subsection}{\numberline {1.1}背景介绍}{1}{subsection.1.1}
-\contentsline {subsubsection}{\numberline {1.1.1}人对个性化的需求}{1}{subsubsection.1.1.1}
-\contentsline {subsubsection}{\numberline {1.1.2}风格迁移的发展}{1}{subsubsection.1.1.2}
-\contentsline {subsubsection}{\numberline {1.1.3}opencl的兴起}{2}{subsubsection.1.1.3}
-\contentsline {subsubsection}{\numberline {1.1.4}Movidius神经网络加速棒的兴起}{3}{subsubsection.1.1.4}
-\contentsline {subsection}{\numberline {1.2}我们要做什么}{4}{subsection.1.2}
-\contentsline {subsection}{\numberline {1.3}我们的最终效果}{5}{subsection.1.3}
-\contentsline {section}{\numberline {第2章}环境配置与web搭建}{6}{section.2}
-\contentsline {subsection}{\numberline {2.1}环境配置}{6}{subsection.2.1}
-\contentsline {subsection}{\numberline {2.2}网站搭建}{6}{subsection.2.2}
-\contentsline {subsubsection}{\numberline {2.2.1}文件管理}{6}{subsubsection.2.2.1}
-\contentsline {subsubsection}{\numberline {2.2.2}UI界面}{7}{subsubsection.2.2.2}
-\contentsline {section}{\numberline {第3章}neural-sytle产生视频}{10}{section.3}
-\contentsline {subsection}{\numberline {3.1}代码说明}{10}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}核心原理}{10}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}主体代码结构}{11}{subsection.3.3}
-\contentsline {subsection}{\numberline {3.4}API接口}{12}{subsection.3.4}
-\contentsline {subsection}{\numberline {3.5}django 调用方式}{12}{subsection.3.5}
-\contentsline {section}{\numberline {第4章}已知问题和未来发展}{14}{section.4}
-\contentsline {subsection}{\numberline {4.1}已知问题}{14}{subsection.4.1}
-\contentsline {subsection}{\numberline {4.2}未来发展}{14}{subsection.4.2}
-\contentsline {subsection}{\numberline {4.3}官方认证}{14}{subsection.4.3}
-\contentsline {section}{\numberline {第5章}加速设备}{15}{section.5}
-\contentsline {subsection}{\numberline {5.1}fpga加速训练过程}{15}{subsection.5.1}
-\contentsline {subsubsection}{\numberline {5.1.1}opencl框架}{15}{subsubsection.5.1.1}
-\contentsline {subsubsection}{\numberline {5.1.2}如何配置fpga}{15}{subsubsection.5.1.2}
-\contentsline {subsubsection}{\numberline {5.1.3}cltorch}{15}{subsubsection.5.1.3}
-\contentsline {subsection}{\numberline {5.2}movidius加速前向传播过程}{15}{subsection.5.2}
-\contentsline {subsubsection}{\numberline {5.2.1}movidius框架}{15}{subsubsection.5.2.1}
-\contentsline {section}{参考文献}{17}{lstnumber.-4.1}
+\contentsline {section}{\numberline {第1章}Introduction}{1}{section.1}
+\contentsline {subsection}{\numberline {1.1}Background}{1}{subsection.1.1}
+\contentsline {subsubsection}{\numberline {1.1.1}Pursuit for personalization}{1}{subsubsection.1.1.1}
+\contentsline {subsubsection}{\numberline {1.1.2}Development of style migration}{1}{subsubsection.1.1.2}
+\contentsline {subsubsection}{\numberline {1.1.3}Emergence of opencl}{2}{subsubsection.1.1.3}
+\contentsline {subsubsection}{\numberline {1.1.4}Movidius Neural Network Accelerator device}{4}{subsubsection.1.1.4}
+\contentsline {subsection}{\numberline {1.2}What we did}{4}{subsection.1.2}
+\contentsline {subsection}{\numberline {1.3}Final result}{6}{subsection.1.3}
+\contentsline {section}{\numberline {第2章}Environment configuration and web building}{7}{section.2}
+\contentsline {subsection}{\numberline {2.1}Environment configuration}{7}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}web building}{7}{subsection.2.2}
+\contentsline {subsubsection}{\numberline {2.2.1}File management}{7}{subsubsection.2.2.1}
+\contentsline {subsubsection}{\numberline {2.2.2}UI interface}{9}{subsubsection.2.2.2}
+\contentsline {section}{\numberline {第3章}neural-sytle generate video}{11}{section.3}
+\contentsline {subsection}{\numberline {3.1}Code description}{11}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Core principle}{11}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Subject code structure}{12}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}API Interface}{13}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}Django call method}{13}{subsection.3.5}
+\contentsline {section}{\numberline {第4章}已知问题和未来发展}{15}{section.4}
+\contentsline {subsection}{\numberline {4.1}已知问题}{15}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}未来发展}{15}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}官方认证}{15}{subsection.4.3}
+\contentsline {section}{参考文献}{16}{subsection.4.3}

@@ -18,7 +18,7 @@ We speculate that people prefer this unique photo that combines its favorite ele
 
 \subsubsection{Development of style migration}\label{section:neural-style}
 Style migration based on deep learning is mainly contain two phase.\ref{tbl:compare-neural-style}
-\addtbl{compare-neuralstyle}
+\addtbl{compare-neuralstyle_en}
 In the first phase, the greatest contribution of the paper is to define what is content and what is style from the mathematical way.
 The network structure is based on VGG-19, and adds two customized loss layers at specific positions to record the loss of content and style respectively.
 
@@ -42,7 +42,7 @@ opencl frame\ref{fig:opencl},users have to do two things if they want to acceler
 \end{enumerate}
 
 However, the opencl code contains too many low-level operations. Just writing a vector plus function, the host file requires more than 200 lines of code. For rapid production, generally adopt some advanced framework, such as table\ref{tbl:compare-opencl-tools}
-\addtbl{compare-opencltools}
+\addtbl{compare-opencltools_en}
 Fpga and gpu are different although both are opencl devices.
 The general workflow of the opencl device is as follows:
 \begin{enumerate}
