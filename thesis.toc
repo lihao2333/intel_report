@@ -17,4 +17,15 @@
 \contentsline {subsection}{\numberline {3.3}主体代码结构}{11}{subsection.3.3}
 \contentsline {subsection}{\numberline {3.4}API接口}{12}{subsection.3.4}
 \contentsline {subsection}{\numberline {3.5}django 调用方式}{12}{subsection.3.5}
-\contentsline {section}{参考文献}{14}{lstnumber.-3.9}
+\contentsline {section}{\numberline {第4章}已知问题和未来发展}{14}{section.4}
+\contentsline {subsection}{\numberline {4.1}已知问题}{14}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}未来发展}{14}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}官方认证}{14}{subsection.4.3}
+\contentsline {section}{\numberline {第5章}加速设备}{15}{section.5}
+\contentsline {subsection}{\numberline {5.1}fpga加速训练过程}{15}{subsection.5.1}
+\contentsline {subsubsection}{\numberline {5.1.1}opencl框架}{15}{subsubsection.5.1.1}
+\contentsline {subsubsection}{\numberline {5.1.2}如何配置fpga}{15}{subsubsection.5.1.2}
+\contentsline {subsubsection}{\numberline {5.1.3}cltorch}{15}{subsubsection.5.1.3}
+\contentsline {subsection}{\numberline {5.2}movidius加速前向传播过程}{15}{subsection.5.2}
+\contentsline {subsubsection}{\numberline {5.2.1}movidius框架}{15}{subsubsection.5.2.1}
+\contentsline {section}{参考文献}{17}{lstnumber.-4.1}

@@ -40,7 +40,7 @@
 结果的细致程度可能比不上第一阶段，　但是由于只进行一次前向传播，耗时比较少，一般在10秒量级．而且，图片的效果可以通过训练数据集的选取来进行拟补．
 其缺点是，如果要生成新的模型，训练时间比较漫长．
 
-\subsubsection{opencl的兴起}
+\subsubsection{opencl的兴起}\label{sec:opencl}
  opencl(Open Computing Language)是一个开源的标准，它的目的是为了提供一个通用的接口使得开发人员能够更容易的让设备辅助cpu进行运算．设备可以使gpu,fpga, dsp等等．它是又Apple在2008年提出，并且收到Nvidia, AMD, Intel, IBM等巨头公司合推的一个项目．在此之前加速往往采用Nvidia的cuda, 但是现在只要该设备支持opencl, 就可以用来辅助计算．
 \addfig[0.8]{opencl.jpg}{fig:opencl}{opencl框架}
 
@@ -68,7 +68,7 @@ opencl设备一般工作流程如下:
 
 然而,表\ref{tbl:compare-opencl-tools}所示的前三种都主要针对gpu类型的opencl设备,第四种虽然针对fpga, 但是我们尝试编译c5p的时候没有编译成功.
 
-\subsubsection{Movidius神经网络加速棒的兴起}
+\subsubsection{Movidius神经网络加速棒的兴起}\label{sec:movidius}
 Movidius神经计算棒是世界上第一款采用USB格式的AI加速器,这个计算棒能够编译并加速边缘神经网络。而且，这款产品并不需要连接到云端，可以直接在本地实现处理。它的工作原理如图\ref{fig:movidius}所示.使用者将训练好的caffe模型或者tensorflow模型用sdk编译,烧录到movidius中. 然后就可以通过sdk提供的api进行加速前向传播.
 \addfig[0.7]{movidius.png}{fig:movidius}{movidius工作流程}
 该产品目前只支持tensorflow和caffe两种深度学习框架,并且提供了一个docker,里面安装了tensorflow,caffe和对应sdk(NC).

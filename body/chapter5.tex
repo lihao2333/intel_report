@@ -1,7 +1,36 @@
-\section{已5未来发展}
-\subsection{已知问题}
-本模板未采用2013版规范的页边距设置，因为实在是办不到2.5CM顶部页边距加上2.6CM的页眉设置啊。
-\subsection{未来发展}
-武汉理工大学本科生论文的未来发展还是需要各位用户的参与，如果每一个用户都能贡献出一点关于\LaTeX 模板的想法和意见，我相信几年之后武汉理工大学本科生论文模板会成为其他高校学习和借鉴的例子。同学当自强，让我们一起来丰富完善这个模板，如果你有很好的建议或者意见请发送到 thesis@tsaoyu.com
-\subsection{官方认证}
-到目前为止（\today ）没有武汉理工大学任何官方组织对于本模板的格式或者内容进行认证，这代表采用本模板进行的论文写作可能不被官方的论文系统接受。如在进行原创性（防抄袭）检测的时候，可能需要提供提供doc版本的论文。希望用户了解到这个潜在的风险，做好文件转换和备份的准备。本人不对任何由于使用本模板而导致的毕业论文纠纷承担任何责任！
+\section{加速设备}
+\subsection{fpga加速训练过程}
+\subsubsection{opencl框架}\label{sec:opencl-step}
+如\ref{sec:opencl}节所介绍的，要实现opencl设备加速，要从宿主机和目标机两方面分别入手．尤其是对于fpga来说,不能够做到实时编译,需要采用离线模式.
+\subsubsection{如何配置fpga}
+最终目标是要把需要fpga做的工作用opencl语言表达,然后通过intel提供的交叉编译工具编译成aocx文件,烧录到fpga中.具体的操作流程可以参考\cite{intel-opencl}其关键步骤如下:
+\begin{enumerate}
+  \item{\textbf{install board}} 将成c5p配套资源和sdk仪器安装到宿主机,并且配置好环境变量以及相关权限
+  \item{\textbf{compile kernel}}  将opencl文件(里面包含了所有kernel函数的信息)编译成aocx镜像文件
+  \item{\textbf{flash}} 利用编译好的aocx文件,将自启动镜像烧录到fpga中.通过重启fpga,使其自动执行镜像进入opencl模式.在该模式下,PCIE端口能够被宿主机所检测到
+  \item{\textbf{program}} 将aocx中的所有信息烧录进fpga中,完成fpga的配置
+\end{enumerate}
+
+我们将其中的一些常用命令进行了封装,托管在我们的github\cite{rcClub}可以提高开发的效率.
+
+通过intel 提供的sdk,我们可以很方便的完成opencl文件的烧录,核心在于如何编写cl文件
+\subsubsection{cltorch}
+cltorch是torch的一个发行版,其在支持大部分torch的功能,并且提供对opencl设备的支持.其本是为了支持opencl的gpu而设计的,但是基于它提供的cl文件,我们也可以实现对fpga的支持.具体步骤如下:
+\begin{enumerate}
+  \item 根据cltorch提供的cl文件,参照\ref{sec:opencl-step}节的过程,配置好fpga
+  \item 将相关的库文件换成intel sdk提供的库文件
+  \item 利用setDevice函数配置加速设备,并且将dtype设置为"torch.ClTensor"
+\end{enumerate}
+之后的代码就按照原先的写法既可.
+到目前为止,我们配置好fpga后,还不能够被cltorch检测到,问题应该是出在替换为intel库文件这一步.我们在咨询技术部的时候,也知道intel的opencl相对于通用的opencl有一定的局限性.我们寄希望与在评审前将这一环节打通.
+\subsection{movidius加速前向传播过程}
+\subsubsection{movidius框架}
+如\ref{sec:movidius}节所示，要实现movidius设备加速，要经过如下步骤.
+
+首先准备训练好的tensorflow模型，利用movidius自带的工具mvNCCheck，将tensorflow模型中的 .meta文件转换成ncs适用的graph文件
+通过如下命令可以实现:
+\begin{lstlisting}
+mvNCCompile wave.meta -s 12 -o wave.graph
+\end{lstlisting}
+
+其次，编写顶层的python文件，与ncs进行通信，将需要变换风格的图片输送到ncs中，再取回其运算结果，因为我们的项目是进行风格变换，所以返回的结果是一个多维向量，将其转换成图片输出就得到了我们需要的结果。
