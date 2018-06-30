@@ -1,0 +1,41 @@
+\section{Environment configuration and web building}
+\subsection{Environment configuration}
+We need the environment configuration as table\ref{tbl:environment}\addtbl{environment}
+Due to the complex environment installation, we created a special mirror based on the ncsdk2 dockfile, hosted in dockerhub, named lihao2333/intel.
+Current version descriptions such as the table\ref{tbl:docker-version}:
+\addtbl{docker-version}
+In addition we also need to install the intel SDK. We installed it according to the instructions in the manual. For ease of use, we encapsulated some related commands and hosted them on Github.\cite{rcClub}
+\subsection{web building}
+\subsubsection{File management}
+图\ref{fig:file-structure}The file storage structure of the project is briefly shown. The name in the figure is for clarity of presentation and may not correspond to the actual name. Some non-core files are not shown.
+\addfig[0.8]{file-structure.jpg}{fig:file-structure}{文件存储结构}
+Among them, fast-neural-sytle and neural-sytle are two engineering catalogues of style migration.
+
+The models folder under the fast-neural-sytle directory stores the trained models. The img files are stored along with the corresponding style pictures of the model for displaying on the web side. main.py is its main executable file.
+
+The models folder under the neural-sytle directory stores the basic network architecture -- the VGG-19 model. main.lua is its main executable file.
+
+neural\_
+The web is the root directory of djagno. In order to be able to invoke the main functions of the two style migrations, they need to be softly connected below neural_web, as shown by the dashed lines.
+
+Set media as the MEDIA\_ROOT of the django project, which has three main sections.
+\begin{description}
+  \item{\textbf{img:}}For img soft links under fast-neural-style, finally display the user-selected style images
+  \item{\textbf{way\_img:}}Save the data in the generated picture mode, which is based on the user / time generated folder as a distinction, each sub-folder saves the user uploaded image data and the final result data
+  \item{\textbf{way\_video:}}Save the data in the generated video mode, which is based on the user/time generated folder, save the user-uploaded content picture in each sub-folder, the style picture, the resulting picture in the iteration process, and the resulting video
+\end{description}
+
+\subsubsection{UI interface}
+\ref{fig:login}The login interface is shown. After logging in, you can see four windows, namely Create Video, Video gallery, Create Image, Image gallery\ref{fig:main}
+\addfig[0.9]{login.png}{fig:login}{登陆界面}
+\addfig[0.9]{main.png}{fig:main}{主界面}
+
+After entering "Create Video", the user uploads his own content image and style picture, click OK, as shown\ref{fig:gen-video}The User can wait or close the interface.
+Then click on "Video gallery" to view the generated video, and you can download it, as shown in the figure.\ref{fig:show-video}
+\addfig[0.9]{gen-video.png}{fig:gen-video}{创建视频界面}
+\addfig[0.9]{show-video.png}{fig:show-video}{Video gallery界面}
+
+If you want to quickly generate a picture, click on "Create Image" and upload your own content image and select a style model, as shown\ref{fig:gen-img}所示.
+Wait a moment will automatically jump to browse the generated image and download, you can also manually click "Image gallery" to view.\ref{fig:show-img}
+\addfig[0.9]{gen-img.png}{fig:gen-img}{创建图像界面}
+\addfig[0.9]{show-img.png}{fig:show-img}{查看图像界面}
