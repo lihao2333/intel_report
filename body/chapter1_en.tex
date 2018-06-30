@@ -1,0 +1,90 @@
+\pagenumbering{arabic}
+
+\section{Introduction}
+%\subsection{背景介绍}
+%\subsection{我们要做什么}
+%\subsection{我们的最终效果}
+\subsection{Background}\label{section:background}
+
+\subsubsection{Pursuit for personalization}
+Our project is server for someone who want to be out of the ordinary in the Internet era. We may feel satisfied by sharing our life to kinds of community platforms. While the Internet has connected more people, it strengthens people's commonalities.For example, Jone took pictures at a scenic spots and wanted to share it with the whole world's friends. However, so many photos are like Jone tooked. It's so ordinary. The cherished things are always like to have their own possession. This is the reason that the blouse is embarrassing.
+
+Applications based on deep learning have become more and more widely used, among which there are some deep learning frameworks for image style transformation that can reconfigure image content and style.
+For the user, simply select a picture style and configure it to implement style transfer.
+As in the previous example, if Jone likes the style of the famous work scream, he can synthesize the figure.\ref{fig:travel}.
+\addfig[1]{travel.png}{fig:travel}{Style migration example}
+
+We speculate that people prefer this unique photo that combines its favorite elements. 
+
+\subsubsection{Development of style migration}\label{section:neural-style}
+Style migration based on deep learning is mainly contain two phase.\ref{tbl:compare-neural-style}
+\addtbl{compare-neuralstyle}
+In the first phase, the greatest contribution of the paper is to define what is content and what is style from the mathematical way.
+The network structure is based on VGG-19, and adds two customized loss layers at specific positions to record the loss of content and style respectively.
+
+The network is divided into two modes, one is the capture mode, which forwards the content image and style image forward respectively, and the corresponding loss layer records the output value of the layer.The other one is the loss mode, which takes a random image as input and calculates the content loss and style loss by forward propagation. Then we can calculate the input image by back propagation.
+
+In contrast to general back-propagation, the network changes the input rather than the weight. It is also the final output result. Since each synthesis is multiple iterations, it takes a lot of time. Combining an image was tooken about 5 hours by cpu calculates(depending on the image size, optimizer and model selection)
+
+In the second phase, according to the parper, we fix the problem that we need too much time to calculate in the first phase. The network can be viewed as an image transformation layer with a distortion layer, where the distortion layer is used to count the total distortion in the function and style which is out of the image transformation layer. Combining the content of style image and a base image, by changing the weight of the image conversion layer, makes the output of the distortion layer minimized and stores a final result as a model which can be considered as a filter of the style.
+
+In this way, a new image only needs to be propagated through the model, so that the results can be obtained by forward propagation. Although the detailed level of results may not be comparable to the first phase, it's tooken less time due to only being thoungh the one forward propagation. By the way, it's tooken about 10 seconds. We find the way to compensate effect by selecting training data set. Like Others, if we'd get a new model, it's would take much time to training.
+
+\subsubsection{Emergence of opencl}
+ OpenCL(Open Computing Language) is an open source standard, its purpose is to provide a common interface so that developers can more easily make the device assist cpu operation. The device can make gpu, fpga, dsp and so on. It was also proposed by Apple in 2008, and received a project jointly promoted by giant companies such as Nvidia, AMD, Intel, and IBM. Prior to this acceleration was often used Nvidia cuda, but now as long as the device supports opencl, it can be used to assist in calculations.
+\addfig[0.8]{opencl.jpg}{fig:opencl}{opencl框架}
+
+The Cyclone V-based FPGA C5P provided by the organizer supports opencl, and is equipped with a special sdk(aocl) for compilation.
+opencl frame\ref{fig:opencl},users have to do two things if they want to accelerate with it
+\begin{enumerate}
+  \item Writing the target file(opencl file). It defines what fpga needs to do. Then use aocl can be directly compiled into aocx file, we can use the aocl provided tools to configure fpga.
+  \item Write the host file(cpp file). It defines how the host communicates with the device (fpga). Then it relies on the library files provided by sdk, and the header file is compiled.
+\end{enumerate}
+
+However, the opencl code contains too many low-level operations. Just writing a vector plus function, the host file requires more than 200 lines of code. For rapid production, generally adopt some advanced framework, such as table\ref{tbl:compare-opencl-tools}
+\addtbl{compare-opencltools}
+Fpga and gpu are different although both are opencl devices.
+The general workflow of the opencl device is as follows:
+\begin{enumerate}
+  \item Program starts
+  \item Program initializes gpu devices
+  \item	Program loads the cl files
+  \item	Program compiles the .cl file as an intermediate file and passes it to the gpu to obtain a handle function
+  \item Program sends data to the gpu through the handle function, and waits for the results
+\end{enumerate}
+
+For general gpu devices, step 1st to step 3rd takes a few seconds, the fourth step takes a few seconds, and the step 5th depends on the data type and data volume.
+For fpga, it cost too long time in the step 4th, it may cost several hours. So fpga cannot be compiled in real time, and the compilation number of the cl file must be burned to fpga in advance.
+
+However, table\ref{tbl:compare-opencl-tools}the first three items are mainly for the opencl device of the gpu type. The fourth one is for fpga, but we did not compile successfully when trying to compile c5p.
+
+\subsubsection{Movidius Neural Network Accelerator device}
+The Movidius neural computing stick is the world's first AI accelerator using the USB format. This calculator can compile and accelerate the edge neural network. Moreover, this product does not need to be connected to the clouds and can be directly processed locally. Its working principle is shown in the figure\ref{fig:movidius}
+The user compiles the trained caffe model or tensorflow model with sdk and burns it into the movidius. Then it can accelerate the forward propagation through the sdk provided API.
+\addfig[0.7]{movidius.png}{fig:movidius}{movidius工作流程}
+The product currently only supports two deep learning frameworks, tensorflow and caffe, and provides a docker with tensorflow, caffe, and corresponding sdk(NC).
+\subsection{What we did}
+such as section: \ref{section:neural-style} The two styles of migration have their own advantages and disadvantages. Neural-style can be used to fuse arbitrary content pictures and style pictures. It is very subtle and can output the results of each step, but it takes too much time to stack a picture. 
+
+On the other hand, both the fpga and the moveidius provided by the organizers have accelerated functions. The former can speed up the training, and the latter can speed up the forward propagation process. So we want to use the acceleration device to complement the shortcomings of two methods.
+
+Neural-style can output the results of each step, then we will combine the results of each step into a video, to show the user a process that evolves from reality to fantasy. In addition, we use the openl deep learning architecture to train, using fpga Accelerate training. Even after acceleration, it may not be able to be real-time display, but it can reducing wait time.
+
+Fast-neural-style can quickly output a good quality result. Then we preset some selected models.
+Users can quickly obtain results after choosing a favorite model. After fast-neural-style, they can complete a forward propagation in more than ten seconds.
+However, it negtively impacts on human experience. We try to give people a real-time feeling by using movidius to accelerate forward propagation reducing time as much as possible
+
+Our architecture design is shown in\ref{fig:top} We build the server on the up2, and the user can access the server through the web page.
+There are two modes for the user to choose from, namely to generate video and generate images, essentially using either neural-style or fast-neural-style.
+\addfig[0.9]{top.jpg}{fig:top}{总体架构图}
+
+If you choose to generate a video, then the user uploads his own content image and style image.
+After submitting, the background will start to use fpga for accelerated training. Of course, the image compiled by opencl file will be burned to fpga through aocl tool in advance.
+During the training process, some column images will be generated, and the images will be merged into one video after the training is completed.
+The generated results are saved in a path that matches the user. After a while, the user can view the output through the web page.
+Users can see a video from the original image to the target image, and you can freely download all the related images and videos.
+
+If you choose to generate a picture, then the user uploads his own content picture and chooses among the offered genre types.
+After submitting, the corresponding model will be called in the background, using movidius to accelerate the forward propagation. Of course, the model will be compiled and burned into the NC in advance.
+The output will be saved in the path corresponding to the user. The user can view the output through the web page and can freely download the related pictures.
+\subsection{Final result}

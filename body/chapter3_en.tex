@@ -1,0 +1,42 @@
+\section{neural-sytle generate video}
+\subsection{Code description}
+The part of this code is based on the neural-sytle on github\cite{neural-style}Rewritten for our needs, now place on our github\cite{neural-style-diy}The main changes are reflected in the following points:
+\begin{enumerate}
+  \item Remove the lbfgs optimizer. Use the adam optimizer instead. Although the adam optimizer is not as efficient as lbfgs, it saves memory and saves time.
+  \item Code re-encapsulation. Before the author's code is integrated in a function, we will rewrite the entire function, divided into several sub-functions, to facilitate debugging and management.
+  \item The aim of solidified the model is time-saving. Before every time you need to load the vgg-19 model, then modify the model, and then training. We directly store the modified model, when used directly can save much time.
+  \item The iteration starts from the content image. The original code is generated from a random image. Our requirement is based on the content image, so the iteration starts from the content image, which can greatly reduce the number of iterative steps.
+\end{enumerate}
+\subsection{Core principle}
+The project defines two kinds of distortion layers, which are content distortion and image distortion, and insert them into the VGG-19 linear model. There are many methods for inserting, and we follow the method mentioned by the author in the paper.\cite{article:neural-style}.
+
+As shown\ref{fig:neural-style-flow},we add style distortion layer behind in relu1\_1,relu2\_1,relu3\_1,relu4\_1,relu5\_1of vgg-19 model, Added a content distortion layer behind the relu4\_2 layer. Relu1\_1 means the activation function layer behind the first convolutional layer of the first convolution block in the vgg-19 model. The vgg-19 model has a total of 5 convolution blocks, specific models can refer here\cite{vgg-19}
+
+There are two main modes of the code. In the capture mode, the user's style picture is propagated. In this process, each synewear layer takes the output result of the style picture to the layer as the target value. Then the user's content picture Forward propagation is performed. In this process, each content-loss layer takes its output to this layer as the target value.
+
+In lossmode, the user's content picture is taken as the forward input, and the total output of each distortion layer is counted, and then the value of the content picture is updated by back propagation.
+This is an iterative process. Under our parameters, a picture with 400 steps of iteration can have a good effect.
+\addfig[0.9]{neural-style-flow.jpg}{fig:neural-style-flow}{neural-style代码的两种模式}
+
+\subsection{Subject code structure}
+This is the main function part of the project code. For the sake of simplification, some details have been deleted, and as far as possible friendly packages have been implemented. The complete code can be obtained from our github.\cite{neural-style-diy}
+\addcode[python]{neural-style-main.lua}
+\begin{itemize}
+\item The second line of setup\_device is used to configure whether the device is accelerated with fpga.
+\item The third line of setup\_images extracts content and style images based on the input path, and the most appropriate image preprocessing
+\item The fourth line of setup\_network\_1 is used to load the VGG-19 model, and the corresponding distortion layer is added according to the input parameters and saved.
+\item The fifth line of setup\_network\_2 is used to perform several forward propagations in capture mode and record the target values to prepare for training.
+\item The sixth line of train is trained by the adam optimizer
+\item The ninth line is the name of the more input content image. Name the output image to ensure that both are in the same directory. This is the cooperation with the web side.
+\end{itemize}
+The fourth and fifth lines store the output network as a local file, and the sixth line is extracted directly from this file during training.
+So for the same input, the fourth and fifth lines need only be executed once, and can be commented out later, which can greatly reduce the debugging time.
+\subsection{API Interface}
+The main api provided by our modified neural-sytle\_diy and the default values such as the table\ref{tbl-abi-neural-style}
+\addtbl{api-neuralstyle}
+\subsection{Django call method}
+The user behavior is essentially to upload a post request containing the content image and style image. After receiving the post request in the background, the image is first bound to the database with user\_id, and then the neural-sytle\_diy interface is called. The code is processed in the background. as follows:
+\addcode[python]{views-neural-style.py}
+
+The func of the 11th line of code is calling neural-sytle. To facilitate the input of parameters, we encapsulate the command directly in the system command, as shown below. The first command is to call the model and generate the output of each step. The second function is to merge the output into a video via ffmepg. This video is synthesized every time the results are displayed.
+\addcode[python]{func-neural-style.py}
