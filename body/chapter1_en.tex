@@ -32,7 +32,7 @@ In this way, a new image only needs to be propagated through the model, so that 
 
 \subsubsection{Emergence of opencl}
  OpenCL(Open Computing Language) is an open source standard, its purpose is to provide a common interface so that developers can more easily make the device assist cpu operation. The device can make gpu, fpga, dsp and so on. It was also proposed by Apple in 2008, and received a project jointly promoted by giant companies such as Nvidia, AMD, Intel, and IBM. Prior to this acceleration was often used Nvidia cuda, but now as long as the device supports opencl, it can be used to assist in calculations.
-\addfig[0.8]{opencl.jpg}{fig:opencl}{opencl框架}
+\addfig[0.8]{opencl.jpg}{fig:opencl}{opencl frame}
 
 The Cyclone V-based FPGA C5P provided by the organizer supports opencl, and is equipped with a special sdk(aocl) for compilation.
 opencl frame\ref{fig:opencl},users have to do two things if they want to accelerate with it
@@ -61,7 +61,7 @@ However, table\ref{tbl:compare-opencl-tools}the first three items are mainly for
 \subsubsection{Movidius Neural Network Accelerator device}
 The Movidius neural computing stick is the world's first AI accelerator using the USB format. This calculator can compile and accelerate the edge neural network. Moreover, this product does not need to be connected to the clouds and can be directly processed locally. Its working principle is shown in the figure\ref{fig:movidius}
 The user compiles the trained caffe model or tensorflow model with sdk and burns it into the movidius. Then it can accelerate the forward propagation through the sdk provided API.
-\addfig[0.7]{movidius.png}{fig:movidius}{movidius工作流程}
+\addfig[0.7]{movidius.png}{fig:movidius}{movidius work flow}
 The product currently only supports two deep learning frameworks, tensorflow and caffe, and provides a docker with tensorflow, caffe, and corresponding sdk(NC).
 \subsection{What we did}
 such as section: \ref{section:neural-style} The two styles of migration have their own advantages and disadvantages. Neural-style can be used to fuse arbitrary content pictures and style pictures. It is very subtle and can output the results of each step, but it takes too much time to stack a picture. 
@@ -76,7 +76,7 @@ However, it negtively impacts on human experience. We try to give people a real-
 
 Our architecture design is shown in\ref{fig:top} We build the server on the up2, and the user can access the server through the web page.
 There are two modes for the user to choose from, namely to generate video and generate images, essentially using either neural-style or fast-neural-style.
-\addfig[0.9]{top.jpg}{fig:top}{总体架构图}
+\addfig[0.9]{top.jpg}{fig:top}{Frame}
 
 If you choose to generate a video, then the user uploads his own content image and style image.
 After submitting, the background will start to use fpga for accelerated training. Of course, the image compiled by opencl file will be burned to fpga through aocl tool in advance.
