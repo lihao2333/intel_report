@@ -1,0 +1,28 @@
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\toprule
+  NAME&DEFAULT&FUNCTION\\
+\midrule
+content\_image&contents/me.jpg&content image path\\
+style\_image&styles/picasso.jpg&style image path\\
+image\_size&512& image zoom scale\\
+backend& clnn& whether to use opencl as an accelerator\\
+gpu& 1& acceleration device Id, if it is cpu, it is -1\\
+init\_image& contents/me.jpg& iteration start point, we choose to start from the content image\\
+proto\_file& models/VGG\_ILSVRC\_19\_layers\_deploy.prototxt\\
+model\_file& models/VGG\_ILSVRC\_19\_layers.caffemodel\\
+content\_weight& 5e0&content distortion weight\
+style\_weight& 20&style distortion weight\\
+content\_layers& relu4\_2& which layers are added a content distortion layer\\
+style\_layers& relu1\_1,relu2\_1,relu3\_1,relu4\_1,relu5\_1& which layers behind the style distortion layer\\
+learning\_rate& 1e1 & learning rate\\
+num\_iterations& 1000& total number of iterations\\
+print\_iter& 1& after several steps to print\\
+save\_iter& 1 & after several steps to save the iteration results\\
+output\_image&output/out.png& output image path\\
+\bottomrule
+\end{tabular}
+\caption{neural-style\_diy API}
+\label{tbl-abi-neural-style}
+\end{table}
