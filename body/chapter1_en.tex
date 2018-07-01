@@ -30,7 +30,7 @@ In the second phase, according to the parper, we fix the problem that we need to
 
 In this way, a new image only needs to be propagated through the model, so that the results can be obtained by forward propagation. Although the detailed level of results may not be comparable to the first phase, it's tooken less time due to only being thoungh the one forward propagation. By the way, it's tooken about 10 seconds. We find the way to compensate effect by selecting training data set. Like Others, if we'd get a new model, it's would take much time to training.
 
-\subsubsection{Emergence of opencl}
+\subsubsection{Emergence of opencl}\label{sec:opencl2}
  OpenCL(Open Computing Language) is an open source standard, its purpose is to provide a common interface so that developers can more easily make the device assist cpu operation. The device can make gpu, fpga, dsp and so on. It was also proposed by Apple in 2008, and received a project jointly promoted by giant companies such as Nvidia, AMD, Intel, and IBM. Prior to this acceleration was often used Nvidia cuda, but now as long as the device supports opencl, it can be used to assist in calculations.
 \addfig[0.8]{opencl.jpg}{fig:opencl}{opencl frame}
 
