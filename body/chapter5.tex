@@ -45,13 +45,12 @@ mvNCCompile wave.meta -s 12 -in input -on output wave.graph
 \end{lstlisting}
 其中-in 和-on分别指定了输入层和输出层所对应的placeholder,需要和代码中的名称匹配
 \subsubsection{顶层通信文件}
-和movidius的核心代码如下
-\addcode[python]{movidius.py}
-主要是如下几点
-\begin{enumerate}
-  \item device的获取
-  \item graph的读取
-  \item	图片参数:均值,方差
-  \item	图片的预处理
-  \item	通过两个fifo来发送,接受数据
-\end{enumerate}
+顶层通信代码主要包含以下几点：
+1. 寻找ncs设备：
+\addcode[python]{ncs-1.py}
+2. 将之前转换好的graph文件导入到ncs设备中，为接下来的神经网络运行做好准备：
+\addcode[python]{ncs-2.py}
+3. 处理图片，将输入的图片处理成tensorflow需要的格式：
+\addcode[python]{ncs-3.py}
+4. 将处理好的图片发送到ncs中，获取输出的结果
+\addcode[python]{ncs-4.py}
