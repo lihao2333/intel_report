@@ -41,8 +41,9 @@ cltorch是torch的一个发行版,其在支持大部分torch的功能,并且提�
 首先准备训练好的tensorflow模型，利用movidius自带的工具mvNCCheck，将tensorflow模型中的 .meta文件转换成ncs适用的graph文件
 通过如下命令可以实现:
 \begin{lstlisting}
-mvNCCompile wave.meta -s 12 -o wave.graph
+mvNCCompile wave.meta -s 12 -in input -on output wave.graph
 \end{lstlisting}
+其中-in 和-on分别指定了输入层和输出层所对应的placeholder,需要和代码中的名称匹配
 \subsubsection{顶层通信文件}
 和movidius的核心代码如下
 \addcode{movidius.py}
