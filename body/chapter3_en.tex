@@ -16,7 +16,7 @@ There are two main modes of the code. In the capture mode, the user's style pict
 
 In lossmode, the user's content picture is taken as the forward input, and the total output of each distortion layer is counted, and then the value of the content picture is updated by back propagation.
 This is an iterative process. Under our parameters, a picture with 400 steps of iteration can have a good effect.
-\addfig[0.9]{neural-style-flow.jpg}{fig:neural-style-flow}{neural-style代码的两种模式}
+\addfig[0.9]{neural-style-flow.jpg}{fig:neural-style-flow}{neural-style two modes of code}
 
 \subsection{Subject code structure}
 This is the main function part of the project code. For the sake of simplification, some details have been deleted, and as far as possible friendly packages have been implemented. The complete code can be obtained from our github.\cite{neural-style-diy}
