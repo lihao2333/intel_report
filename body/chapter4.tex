@@ -1,7 +1,32 @@
-\section{已知问题和未来发展}
-\subsection{已知问题}
-本模板未采用2013版规范的页边距设置，因为实在是办不到2.5CM顶部页边距加上2.6CM的页眉设置啊。
-\subsection{未来发展}
-武汉理工大学本科生论文的未来发展还是需要各位用户的参与，如果每一个用户都能贡献出一点关于\LaTeX 模板的想法和意见，我相信几年之后武汉理工大学本科生论文模板会成为其他高校学习和借鉴的例子。同学当自强，让我们一起来丰富完善这个模板，如果你有很好的建议或者意见请发送到 thesis@tsaoyu.com
-\subsection{官方认证}
-到目前为止（\today ）没有武汉理工大学任何官方组织对于本模板的格式或者内容进行认证，这代表采用本模板进行的论文写作可能不被官方的论文系统接受。如在进行原创性（防抄袭）检测的时候，可能需要提供提供doc版本的论文。希望用户了解到这个潜在的风险，做好文件转换和备份的准备。本人不对任何由于使用本模板而导致的毕业论文纠纷承担任何责任！
+\section{fast-neural-style 产生图片}
+\subsection{核心原理}
+其原理如图\ref{fig:fast-neural-style-principle}所示
+\addfig[0.8]{fast-neural-style-principle.png}{fig:fast-neural-style-principle}{fast-nerual-style原理}
+整个网络可以视为两部分,图形变换网络和失真网络.
+
+图形变换网络是一个深度残余神经网络,由参数$W$表征.它将输入图像通过映射$\hat y=f_W(X)$转换为输出图像$\hat y$
+
+每一个失真函数通过计算$l_i(\hat y,y_i)$来衡量输出图片$\hat y$和目标图片$y$的差异.
+
+图形变换网络通过随机梯度下降法,以最小化总失真为目标进行训练.
+
+目前采用的数据集是COCO dataset，里面包含了大量的通用性图片．
+
+训练好模型之后，输入图像$x$经过一次前向传播，经过图形变换层就能够得到输出结果.所以速度非常块
+\subsection{代码结构}
+
+\subsection{调用方式}
+
+\subsubsection{API接口}
+fast-neural-sytle提供的主要api以及默认值如表\ref{tbl-abi-neural-style}所示
+\addtbl{api-fastneuralstyle}
+\subsubsection{django调用fast-neural-style}
+如图\ref{fig:top}所示，当接收到用户的post请求时,后台先获取内容图片和风格模型信息，存入数据库后调用fast-neural-style的api.在用户请求页面展示的时候，后台通过用户id查询数据库，将输出结果呈现．
+产生图片的代码如下所示
+\addcode[python]{gen-image.py}
+其中第十行为通过系统命令调用fast-neural-style接口．其代码如下所示
+\addcode[python]{func-fast-neural-style.py}
+查看图片的代码如下所示
+\addcode[python]{show-image.py}
+
+

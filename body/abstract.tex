@@ -1,15 +1,29 @@
+\centerline{\bfseries\zihao{3} 把艺术家带回家--快速风格变换系统}
 \section*{\zihao{3} \centering 摘要}
-在互联网时代，人们对个性化的需求日益明显，人们希望自己在朋友圈中留下的纪念会与众不同．我们采用快速风格变换的技术，能够将一张普通的照片变换为一张极具梦幻色彩的图片．同时采用风格变换技术，生成一个从现实到梦幻过度的一个小视频．而用户可以自己定制自己的风格，所以每一张图片或视频都是与众不同的．
-
+我们的项目基于一种假设，人们希望自己的照片变得与众不同，拥有自己的特色．
+目前利用深度学习实现图像风格迁移有两种方式，第一种是利用内容图片和风格图片设定好目标值后，从一个随机点不断迭代来接近目标值．第二种是选定一个风格图片后通过大量的内容图片集训练成为一个模型，使得新的内容图片以此前向传播就能够得到输出．
+两种方式各有优缺，前者效果好，每一步迭代都有输出，但是时间长．后者虽然速度快，但是必须对风格图片提前训练好模型．
+我们希望利用支持opencl的intel cp5 fpga来加速前者的迭代过程，用intel 神经网络计算棒movidius来加速后者的前向传播过程，同时将前者的每一步输出整合为一个视频．
+最终，用户登录网页，可以上传一张风格图片和内容图片得到一个从原始图片到目标图片渐变的视频．还可以上传内容图片并且选中一个预置的风格模型来快速生成一张风格迁移图片．前者能给人真实感，后者能给人梦幻感．
 \vskip0.5cm
 
-\textbf{关键词:}  风格变换，　快速风格变换, FPGA加速，　Movidius加速, 个性化需求
+\textbf{关键词:}  风格变换，　快速风格变换, FPGA加速，　Movidius加速, 个性化需求,opencl,intel
 \addcontentsline{toc}{section}{摘要}
 
 \clearpage
+\centerline{\bfseries\zihao{3} AINASCERE GALLERY}
+\centerline{\bfseries\zihao{3} FAST SYTLE TRANSFORMATION SYSTEM}
 \section*{\zihao{2} \centering \textbf{Abstract} }
    %用了Times New Roman字体来美化观感
-\textbf{Key Words:}
+
+Our project is based on an assumption that people want their photos to be different and have their own characteristics.
+At present, there are two ways to realize image style migration by deep learning. The first one is to use the content picture and the style picture to set the target value, and then iterate from a random point to approach the target value. The second is to select a style picture and train it into a model through a large number of content picture sets, so that the new content picture can be outputted by forward propagation.
+There are advantages and disadvantages in both methods. The former has a good effect, and each step has an output, but the time is long. Although the latter is fast, it is necessary to train the model in advance for the style picture.
+We hope to use the Intel cp5 fpga that supports opencl to accelerate the iterative process of the former, and use the Intel Movidius to accelerate the forward propagation process of the latter, and at the same time, integrate the output of each step of the former into a video.
+
+Finally, when the user logs in to the webpage, he can upload a style image and content image to get a video from the original image to the target image. Users can also upload a content image and select a preset style model to quickly generate a style migration image. The former gives a sense of reality, the latter gives a sense of dreaminess.
+
+\textbf{Key Words:} style transfer, fast style transfer, fpga accelerate, movidius,individuation,opencl,intel
 \addcontentsline{toc}{section}{Abstract}
 
 
