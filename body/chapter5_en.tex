@@ -1,7 +1,7 @@
 \section{Acceleration equipment}
 \subsection{Fpga speeds up the training process}
 \subsubsection{Opencl framework}\label{sec:opencl-step}
-Such as\ref{sec:opencl}, To achieve opencl device acceleration, we must start from the host and the target machine separately. Especially for fpga, it cannot be compiled in real time and it needs to use offline mode.
+Such as section: \ref{sec:opencl}, To achieve opencl device acceleration, we must start from the host and the target machine separately. Especially for fpga, it cannot be compiled in real time and it needs to use offline mode.
 \subsubsection{How to configure fpga}
 The ultimate goal is to express the work that needs fpga to be expressed in opencl language, and then compile it into aocx file through cross compiler tools provided by intel, and burn it into fpga. The specific operation process can refer to the key steps of \cite{intel-opencl}. as follows:
 \begin{enumerate}
@@ -25,7 +25,7 @@ So far, we have configured fpga, but it still cannot be detected by cltorch. The
 \subsection{movidius accelerate the forward propagation process}
 \subsubsection{modify the source code}
 
-Such as\ref{sec:movidius}, to implement the speed-up of the movidius device, you need to compile the model into the required format.
+Such as section: \ref{sec:movidius}, to implement the speed-up of the movidius device, you need to compile the model into the required format.
 But you need to modify the original evaluation code due to that only makes moveidius do the inference part of the work. Just retain its inference part of the code. The specific repair work is as follows:
 \begin{enumerate}
     \item Drop dropout layer

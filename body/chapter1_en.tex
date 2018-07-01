@@ -11,13 +11,13 @@ Our project is server for someone who want to be out of the ordinary in the Inte
 
 Applications based on deep learning have become more and more widely used, among which there are some deep learning frameworks for image style transformation that can reconfigure image content and style.
 For the user, simply select a picture style and configure it to implement style transfer.
-As in the previous example, if Jone likes the style of the famous work scream, he can synthesize the figure.\ref{fig:travel}.
+As in the previous example, if Jone likes the style of the famous work scream, he can synthesize the figure \ref{fig:travel}.
 \addfig[1]{travel.png}{fig:travel}{Style migration example}
 
 We speculate that people prefer this unique photo that combines its favorite elements. 
 
 \subsubsection{Development of style migration}\label{section:neural-style}
-Style migration based on deep learning is mainly contain two phase.\ref{tbl:compare-neural-style}
+Style migration based on deep learning is mainly contain two phase, as table \ref{tbl:compare-neural-style}
 \addtbl{compare-neuralstyle_en}
 In the first phase, the greatest contribution of the paper is to define what is content and what is style from the mathematical way.
 The network structure is based on VGG-19, and adds two customized loss layers at specific positions to record the loss of content and style respectively.
@@ -35,13 +35,13 @@ In this way, a new image only needs to be propagated through the model, so that 
 \addfig[0.8]{opencl.jpg}{fig:opencl}{opencl frame}
 
 The Cyclone V-based FPGA C5P provided by the organizer supports opencl, and is equipped with a special sdk(aocl) for compilation.
-opencl frame\ref{fig:opencl},users have to do two things if they want to accelerate with it
+opencl frame, as figure \ref{fig:opencl},users have to do two things if they want to accelerate with it
 \begin{enumerate}
   \item Writing the target file(opencl file). It defines what fpga needs to do. Then use aocl can be directly compiled into aocx file, we can use the aocl provided tools to configure fpga.
   \item Write the host file(cpp file). It defines how the host communicates with the device (fpga). Then it relies on the library files provided by sdk, and the header file is compiled.
 \end{enumerate}
 
-However, the opencl code contains too many low-level operations. Just writing a vector plus function, the host file requires more than 200 lines of code. For rapid production, generally adopt some advanced framework, such as table\ref{tbl:compare-opencl-tools}
+However, the opencl code contains too many low-level operations. Just writing a vector plus function, the host file requires more than 200 lines of code. For rapid production, generally adopt some advanced framework, such as table \ref{tbl:compare-opencl-tools}
 \addtbl{compare-opencltools_en}
 Fpga and gpu are different although both are opencl devices.
 The general workflow of the opencl device is as follows:
