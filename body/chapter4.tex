@@ -14,6 +14,9 @@
 
 训练好模型之后，输入图像$x$经过一次前向传播，经过图形变换层就能够得到输出结果.所以速度非常块
 \subsection{代码结构}
+\subsubsection{前向传播过程}
+前向传播的过程比较清晰,只需要读取图片送入session中运行就可以,其中图片处理占的篇幅比较大,下面的代码是省略图片处理部分的代码.完整代码请看我们的github\cite{my-fast-neural-sytle-tensorflow}
+\addcode[python]{eval.py}
 
 \subsection{调用方式}
 
@@ -28,5 +31,3 @@ fast-neural-sytle提供的主要api以及默认值如表\ref{tbl-abi-neural-styl
 \addcode[python]{func-fast-neural-style.py}
 查看图片的代码如下所示
 \addcode[python]{show-image.py}
-
-
