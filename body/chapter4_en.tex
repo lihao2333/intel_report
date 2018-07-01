@@ -1,6 +1,6 @@
 \section{Fast-neural-style produce pictures}
 \subsection{mainly principle}
-The principle is shown in figure\ref{fig:fast-neural-style-principle}所示
+The principle is shown in figure\ref{fig:fast-neural-style-principle}
 \addfig[0.8]{fast-neural-style-principle.png}{fig:fast-neural-style-principle}{Principle of fast-nerual-style}
 The entire network can be viewed as two parts, a graphical transformation network and a distorted network.
 
@@ -20,11 +20,11 @@ After training the model, the input image $x$ is propagated once through the fro
 \subsubsection{API}
 The main API provided by fast-neural-sytle and the default values are as follows\ref{tbl-abi-neural-style}
 \addtbl{api-fastneuralstyle}
-\subsubsection{django调用fast-neural-style}
-如图\ref{fig:top}所示，当接收到用户的post请求时,后台先获取内容图片和风格模型信息，存入数据库后调用fast-neural-style的api.在用户请求页面展示的时候，后台通过用户id查询数据库，将输出结果呈现．
-产生图片的代码如下所示
+\subsubsection{django called fast-neural-style}
+Such as\ref{fig:top}, When receiving the user's post request, firstly, the background obtains the content image and the style model information, and then stores the database and calls the fast-neural-style API. When the user requests the page to display, the background queries the database through the user id and outputs the result to presented.
+The code that produces the image is as follows
 \addcode[python]{gen-image.py}
-其中第十行为通过系统命令调用fast-neural-style接口．其代码如下所示
+The tenth of these calls the fast-neural-style interface through system commands. The code is as follows:
 \addcode[python]{func-fast-neural-style.py}
-查看图片的代码如下所示
+The code for viewing the picture is as follows
 \addcode[python]{show-image.py}
