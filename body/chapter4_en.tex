@@ -14,9 +14,11 @@ The data set currently used is the COCO dataset, which contains a large number o
 
 After training the model, the input image $x$ is propagated once through the front, and after the graphics transformation layer can get the output. So it's highly speed.
 \subsection{Code structure}
+\subsubsection{Forward propagation process}
+The process of forward propagation is relatively clear. It only needs to read the image and send it to the session. The image processing takes up a lot of space. The following code is the code that omits the image processing part. For the complete code, please see our github.\cite{my-fast-neural-sytle-tensorflow}
+\addcode[python]{eval.py}
 
 \subsection{Call method}
-
 \subsubsection{API}
 The main API provided by fast-neural-sytle and the default values are as followed table \ref{tbl-abi-neural-style}
 \addtbl{api-fastneuralstyle_en}
