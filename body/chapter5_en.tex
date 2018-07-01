@@ -1,0 +1,56 @@
+\section{Acceleration equipment}
+\subsection{Fpga speeds up the training process}
+\subsubsection{Opencl framework}\label{sec:opencl-step}
+Such as\ref{sec:opencl}, To achieve opencl device acceleration, we must start from the host and the target machine separately. Especially for fpga, it cannot be compiled in real time and it needs to use offline mode.
+\subsubsection{How to configure fpga}
+The ultimate goal is to express the work that needs fpga to be expressed in opencl language, and then compile it into aocx file through cross compiler tools provided by intel, and burn it into fpga. The specific operation process can refer to the key steps of \cite{intel-opencl}. as follows:
+\begin{enumerate}
+  \item{\textbf{install board}} Install the c5p companion resource and sdk instrument to the host, and configure the environment variables and related permissions
+  \item{\textbf{compile kernel}} Compile the opencl file (which contains information about all kernel functions) into an aocx image file.
+  \item{\textbf{flash}} Use the compiled aocx file to burn the self-starting image to fpga. By restarting fpga, it automatically performs mirroring into opencl mode. In this mode, the PCIE port can be detected by the host.
+  \item{\textbf{program}} Burn all the information in aocx into fpga, complete the fpga configuration
+\end{enumerate}
+
+We encapsulate some of these commonly used commands, and hosting them in our github\cite{rcClub} can improve development efficiency.
+
+Through the sdk provided by intel, we can easily complete the burning of opencl files, the core is how to write cl files\subsubsection{cltorch}
+Cltorch is a distribution of torch, which supports most of the functions of torch and provides support for opencl devices. It was designed to support opencl gpu, but based on the cl file it provides, we can also implement Fpga support. The specific steps are as follows:
+\begin{enumerate}
+  \item According to the cl file provided by cltorch, refer to the procedure of \ref{sec:opencl-step}, configure fpga
+  \item Replace the relevant library file with the library file provided by intel sdk
+  \item Configure the acceleration device with the setDevice function and set the dtype to "torch.ClTensor"
+\end{enumerate}
+We write the latter code according to this. 
+So far, we have configured fpga, but it still cannot be detected by cltorch. The problem should be in intel library file. When we consulted the technical department, we also know that intel's opencl has more limitations than the common opencl. We hope to overcome this problem before the final review.
+\subsection{movidius accelerate the forward propagation process}
+\subsubsection{modify the source code}
+
+Such as\ref{sec:movidius}, to implement the speed-up of the movidius device, you need to compile the model into the required format.
+But you need to modify the original evaluation code due to that only makes moveidius do the inference part of the work. Just retain its inference part of the code. The specific repair work is as follows:
+\begin{enumerate}
+    \item Drop dropout layer
+    \item Delete the data import read part of the code
+     \item  Delete the code that calculates the loss function part
+     \item  Delete all placeholders except the input layer
+\end{enumerate}
+Then add the Saver class to export a meta file.
+
+The revised version of this project is hosted on our github\cite{my-nerual-style-tensorflow}
+\subsubsection{Model compilation}
+First prepare the trained tensorflow model, and use the tool mvNCCheck that comes with the moveidius to convert the .meta file in the tensorflow model into the graph file for ncs.
+This can be achieved by the following command:
+\begin{lstlisting}
+mvNCCompile wave.meta -s 12 -in input -on output wave.graph
+\end{lstlisting}
+Where -in and -on specify the placeholder corresponding to the input and output layers, respectively, and need to match the names in the code
+\subsubsection{Top level communication file}
+The core code of movidius is as follows
+\addcode[python]{movidius.py}
+The main points are as follows
+\begin{enumerate}
+  \item Access to device
+  \item Graph reading
+  \item Picture parameters: mean, variance
+  \item Image preprocessing
+  \item Send by two fifo, accept data
+\end{enumerate}
