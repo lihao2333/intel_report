@@ -18,11 +18,11 @@ After training the model, the input image $x$ is propagated once through the fro
 \subsection{Call method}
 
 \subsubsection{API}
-The main API provided by fast-neural-sytle and the default values are as follows\ref{tbl-abi-neural-style}
+The main API provided by fast-neural-sytle and the default values are as followed table \ref{tbl-abi-neural-style}
 \addtbl{api-fastneuralstyle}
 \subsubsection{django called fast-neural-style}
 Such as\ref{fig:top}, When receiving the user's post request, firstly, the background obtains the content image and the style model information, and then stores the database and calls the fast-neural-style API. When the user requests the page to display, the background queries the database through the user id and outputs the result to presented.
-The code that produces the image is as follows
+The code that produces the image is as follows:
 \addcode[python]{gen-image.py}
 The tenth of these calls the fast-neural-style interface through system commands. The code is as follows:
 \addcode[python]{func-fast-neural-style.py}
