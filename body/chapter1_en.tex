@@ -58,7 +58,7 @@ For fpga, it cost too long time in the step 4th, it may cost several hours. So f
 
 However, table \ref{tbl:compare-opencl-tools}the first three items are mainly for the opencl device of the gpu type. The fourth one is for fpga, but we did not compile successfully when trying to compile c5p.
 
-\subsubsection{Movidius Neural Network Accelerator device}
+\subsubsection{Movidius Neural Network Accelerator device}\label{sec:movidius}
 The Movidius neural computing stick is the world's first AI accelerator using the USB format. This calculator can compile and accelerate the edge neural network. Moreover, this product does not need to be connected to the clouds and can be directly processed locally. Its working principle is shown in the figure\ref{fig:movidius}
 The user compiles the trained caffe model or tensorflow model with sdk and burns it into the movidius. Then it can accelerate the forward propagation through the sdk provided API.
 \addfig[0.7]{movidius.png}{fig:movidius}{movidius work flow}
