@@ -88,3 +88,7 @@ If you choose to generate a picture, then the user uploads his own content pictu
 After submitting, the corresponding model will be called in the background, using movidius to accelerate the forward propagation. Of course, the model will be compiled and burned into the NC in advance.
 The output will be saved in the path corresponding to the user. The user can view the output through the web page and can freely download the related pictures.
 \subsection{Final result}
+Finally, After users log in the webpage, they can get a video by uploading the content image and the style image, and quickly get a picture by uploading the content image and selecting the style model.
+The specific process can be referred to in the \ref{sec:ui} section.
+On the accelerator side, we implemented the front-line propagation process of using motionidius to speed up the production of images.
+When using fpga to speed up the production of video parts, we are in bottleneck, hoping to overcome before the review.
