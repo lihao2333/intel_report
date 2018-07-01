@@ -10,7 +10,7 @@ The part of this code is based on the neural-sytle on github\cite{neural-style}R
 \subsection{Core principle}
 The project defines two kinds of distortion layers, which are content distortion and image distortion, and insert them into the VGG-19 linear model. There are many methods for inserting, and we follow the method mentioned by the author in the paper.\cite{article:neural-style}.
 
-As shown\ref{fig:neural-style-flow},we add style distortion layer behind in relu1\_1,relu2\_1,relu3\_1,relu4\_1,relu5\_1of vgg-19 model, Added a content distortion layer behind the relu4\_2 layer. Relu1\_1 means the activation function layer behind the first convolutional layer of the first convolution block in the vgg-19 model. The vgg-19 model has a total of 5 convolution blocks, specific models can refer here\cite{vgg-19}
+As shown in the figure \ref{fig:neural-style-flow},we add style distortion layer behind in relu1\_1,relu2\_1,relu3\_1,relu4\_1,relu5\_1of vgg-19 model, Added a content distortion layer behind the relu4\_2 layer. Relu1\_1 means the activation function layer behind the first convolutional layer of the first convolution block in the vgg-19 model. The vgg-19 model has a total of 5 convolution blocks, specific models can refer here\cite{vgg-19}
 
 There are two main modes of the code. In the capture mode, the user's style picture is propagated. In this process, each synewear layer takes the output result of the style picture to the layer as the target value. Then the user's content picture Forward propagation is performed. In this process, each content-loss layer takes its output to this layer as the target value.
 
@@ -32,7 +32,7 @@ This is the main function part of the project code. For the sake of simplificati
 The fourth and fifth lines store the output network as a local file, and the sixth line is extracted directly from this file during training.
 So for the same input, the fourth and fifth lines need only be executed once, and can be commented out later, which can greatly reduce the debugging time.
 \subsection{API Interface}
-The main api provided by our modified neural-sytle\_diy and the default values such as the table\ref{tbl-abi-neural-style}
+The main api provided by our modified neural-sytle\_diy and the default values such as the table \ref{tbl-abi-neural-style}
 \addtbl{api-neuralstyle_en}
 \subsection{Django call method}
 The user behavior is essentially to upload a post request containing the content image and style image. After receiving the post request in the background, the image is first bound to the database with user\_id, and then the neural-sytle\_diy interface is called. The code is processed in the background. as follows:
