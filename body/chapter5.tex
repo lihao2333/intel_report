@@ -24,13 +24,33 @@ cltorch是torch的一个发行版,其在支持大部分torch的功能,并且提�
 之后的代码就按照原先的写法既可.
 到目前为止,我们配置好fpga后,还不能够被cltorch检测到,问题应该是出在替换为intel库文件这一步.我们在咨询技术部的时候,也知道intel的opencl相对于通用的opencl有一定的局限性.我们寄希望与在评审前将这一环节打通.
 \subsection{movidius加速前向传播过程}
-\subsubsection{movidius框架}
-如\ref{sec:movidius}节所示，要实现movidius设备加速，要经过如下步骤.
+\subsubsection{修改源代码}
 
+如\ref{sec:movidius}节所示，要实现movidius设备加速,需要将模型编译成需要的格式.
+但是因为只是让movidius做推理部分的工作,所以需要对原先的评估代码做修改,只保留它的推理部分代码.具体修要修改的工作如下:
+\begin{enumerate}
+	\item 删除dropout层
+	\item 删除数据导入读取部分个代码
+	 \item	删除计算损失函数部分的代码
+	 \item	删除除了输入层之外的所有placeholder
+\end{enumerate}
+然后添加Saver类,导出一个meta文件既可.
+
+本项目修改后的版本托管在我们github\cite{my-nerual-style-tensorflow}上
+\subsubsection{模型编译}
 首先准备训练好的tensorflow模型，利用movidius自带的工具mvNCCheck，将tensorflow模型中的 .meta文件转换成ncs适用的graph文件
 通过如下命令可以实现:
 \begin{lstlisting}
 mvNCCompile wave.meta -s 12 -o wave.graph
 \end{lstlisting}
-
-其次，编写顶层的python文件，与ncs进行通信，将需要变换风格的图片输送到ncs中，再取回其运算结果，因为我们的项目是进行风格变换，所以返回的结果是一个多维向量，将其转换成图片输出就得到了我们需要的结果。
+\subsubsection{顶层通信文件}
+和movidius的核心代码如下
+\addcode{movidius.py}
+主要是如下几点
+\begin{enumerate}
+  \item device的获取
+  \item graph的读取
+  \item	图片参数:均值,方差
+  \item	图片的预处理
+  \item	通过两个fifo来发送,接受数据
+\end{enumerate}
