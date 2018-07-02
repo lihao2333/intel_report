@@ -46,6 +46,7 @@ mvNCCompile wave.meta -s 12 -in input -on output wave.graph
 其中-in 和-on分别指定了输入层和输出层所对应的placeholder,需要和代码中的名称匹配
 \subsubsection{顶层通信文件}
 顶层通信代码主要包含以下几点：
+
 1. 寻找ncs设备：
 \addcode[python]{ncs-1.py}
 2. 将之前转换好的graph文件导入到ncs设备中，为接下来的神经网络运行做好准备：

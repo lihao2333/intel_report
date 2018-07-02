@@ -1,0 +1,977 @@
+ 2018 年英特尔杯大学生电子设计竞赛嵌入式系统专题邀请赛
+
+   2018 Intel Cup Undergraduate Electronic Design Contest
+
+       - Embedded System Design Invitational Contest
+
+
+
+             作品设计报告
+               Final Report
+
+
+
+
+报告题目：把艺术家带回家－－快速风格变换系统
+
+
+         学生姓名: 李昊 陈尧 李语涵
+         指导教师:          陈文成
+         参赛学校:          北京邮电大学
+2018 年英特尔杯大学生电子设计竞赛嵌入式系统专题邀请赛
+
+
+       参赛作品原创性声明
+
+   本人郑重声明：所呈交的参赛作品报告，是本人和队友独立进
+
+ 行研究工作所取得的成果。除文中已经注明引用的内容外，本论文
+
+ 不包含任何其他个人或集体已经发表或撰写过的作品成果，不侵犯
+
+ 任何第三方的知识产权或其他权利。本人完全意识到本声明的法律
+
+ 结果由本人承担。
+
+
+
+
+              参赛队员签名：
+
+
+
+
+                  日期：   年   月   日
+               把艺术家带回家–快速风格变换系统
+
+                               摘要
+   我们的项目基于一种假设，人们希望自己的照片变得与众不同，拥有自己的特色．目前利用深
+度学习实现图像风格迁移有两种方式，第一种是利用内容图片和风格图片设定好目标值后，从一个
+随机点不断迭代来接近目标值．第二种是选定一个风格图片后通过大量的内容图片集训练成为一个
+模型，使得新的内容图片以此前向传播就能够得到输出．两种方式各有优缺，前者效果好，每一步
+迭代都有输出，但是时间长．后者虽然速度快，但是必须对风格图片提前训练好模型．我们希望利
+用支持 opencl 的 intel cp5 fpga 来加速前者的迭代过程，用 intel 神经网络计算棒 movidius 来加速
+后者的前向传播过程，同时将前者的每一步输出整合为一个视频．最终，用户登录网页，可以上传
+一张风格图片和内容图片得到一个从原始图片到目标图片渐变的视频．还可以上传内容图片并且选
+中一个预置的风格模型来快速生成一张风格迁移图片．前者能给人真实感，后者能给人梦幻感．
+
+   关键词: 风格变换，　快速风格变换, FPGA 加速，　 Movidius 加速, 个性化需求,opencl,intel
+
+
+
+
+                                 i
+                 AINASCERE GALLERY
+         FAST SYTLE TRANSFORMATION SYSTEM
+
+                                         Abstract
+    Our project is based on an assumption that people want their photos to be different and have
+their own characteristics. At present, there are two ways to realize image style migration by deep
+learning. The first one is to use the content picture and the style picture to set the target value,
+and then iterate from a random point to approach the target value. The second is to select a style
+picture and train it into a model through a large number of content picture sets, so that the new
+content picture can be outputted by forward propagation. There are advantages and disadvantages
+in both methods. The former has a good effect, and each step has an output, but the time is long.
+Although the latter is fast, it is necessary to train the model in advance for the style picture. We
+hope to use the Intel cp5 fpga that supports opencl to accelerate the iterative process of the former,
+and use the Intel Movidius to accelerate the forward propagation process of the latter, and at the
+same time, integrate the output of each step of the former into a video.
+    Finally, when the user logs in to the webpage, he can upload a style image and content image
+to get a video from the original image to the target image. Users can also upload a content image
+and select a preset style model to quickly generate a style migration image. The former gives a
+sense of reality, the latter gives a sense of dreaminess.
+    Key Words: style transfer, fast style transfer, fpga accelerate, movidius,individuation,opencl,intel
+
+
+
+
+                                                   ii
+                                                目录
+摘要                                                                                                         i
+
+Abstract                                                                                                  ii
+
+第 1 章 绪论                                                                                                   1
+  1.1   背景介绍        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    1
+        1.1.1   人对个性化的需求 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .                 1
+        1.1.2   风格迁移的发展 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .              1
+        1.1.3   opencl 的兴起 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .         2
+        1.1.4   Movidius 神经网络加速棒的兴起 . . . . . . . . . . . . . . . . . . . . . . . . .                      3
+  1.2   我们要做什么 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .             4
+  1.3   我们的最终效果 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .              5
+
+第 2 章 环境配置与 web 搭建                                                                                         6
+  2.1   环境配置        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    6
+  2.2   网站搭建        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    6
+        2.2.1   文件管理 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .           6
+        2.2.2   UI 界面 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        7
+
+第 3 章 neural-sytle 产生视频                                                                                   11
+  3.1   代码说明        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   11
+  3.2   核心原理        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   11
+  3.3   主体代码结构 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .            12
+  3.4   API 接口 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        13
+  3.5   django 调用方式 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .           13
+
+第 4 章 fast-neural-style 产生图片                                                                              15
+  4.1   核心原理        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   15
+  4.2   代码结构        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   15
+        4.2.1   前向传播过程 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .            15
+  4.3   调用方式        . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   16
+        4.3.1   API 接口 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        16
+        4.3.2   django 调用 fast-neural-style . . . . . . . . . . . . . . . . . . . . . . . . . . .         16
+
+第 5 章 加速设备                                                                                                18
+  5.1   fpga 加速训练过程 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .             18
+        5.1.1   opencl 框架 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       18
+        5.1.2   如何配置 fpga . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .         18
+        5.1.3   cltorch . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   18
+  5.2   movidius 加速前向传播过程 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .                 18
+        5.2.1   修改源代码 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .           18
+        5.2.2   模型编译 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .          19
+
+
+                                                    iii
+                          把艺术家带回家–快速风格变换系统
+
+
+   5.2.3   顶层通信文件 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   19
+
+参考文献                                                                                        21
+
+
+
+
+                                           iv
+                             把艺术家带回家–快速风格变换系统
+
+
+                                    第 1 章 绪论
+1.1     背景介绍
+1.1.1    人对个性化的需求
+
+   我们的项目基于一种假设: 在互联网时代，每个人都希望自己是与众不同的. 人们喜欢发朋友圈
+来记录自己的生活，并且从中获得满足．互联网连接了更多的人的同时, 也强化了人们的共性．举个
+例子, 小王去一个景点拍照留念, 并且想发到朋友圈中留念. 然而他的照片在朋友圈中显得微不足道,
+因为没有独特的视角, 也没有独特的美景, 仅仅是人不同. 人们看到自己喜欢, 珍视的东西总是喜欢
+独自占有, 这也是撞衫会令人尴尬的原因
+   基于深度学习的应用变得越来越广泛，其中就有一些针对图像风格变换的深度学习架构，能够
+实现图像内容和风格的重新组合．对于使用者来说，只要选择一副的图片风格，经过必要的配置，就
+能实现风格迁移. 还是之前的例子, 小王如果喜欢著名作品 scream 的风格, 他可以很合成出图1.1的
+结果.
+
+
+
+
+                                       图 1.1 风格迁移示例
+
+
+   我们猜测人们更喜欢这种结合了自己所喜爱元素并且独一无二的照片.
+
+1.1.2    风格迁移的发展
+
+   基于深度学习的风格变换主要分为两个阶段, 其概况如表1.1所示．
+
+      名称          neural style[6]                     fast neural style[1]
+
+      实现方式        先确立目标值，再多次迭代逼近                      先训练模型，再前向传播
+      特点          时间长，可以输出每次迭代的结果 时间短，每种风格必须预训练好模型
+      已有代码版本 caffe tensorflow torch                   caffe tensorflow torch
+
+                                    表 1.1 neural style 发展概况
+
+
+   第一阶段, 该论文最大的贡献在于从数学的方式定义了什么是 content 什么是 style. 网络结构
+以 VGG-19 为基础，在特定位置添加了自定义的两种 loss 层来分别记录 content 和 style 的 loss. 该
+网络分为两种模式，一种是 capture 模式，该模式分别下前向传播 content 图像和 style 图像，对应
+
+                                              1
+                     把艺术家带回家–快速风格变换系统
+
+
+的 loss 层会记录该层的输出值．另一种是 loss 模式，　该模式下将一张随机图像作为输入，通过前
+向传播计算对应 content loss 和 style 　 loss. 然后通过反向传播去改变输入图像．
+   和一般网络的反向传播不同, 该网络最终改变的不是网络权值而是输入图像, 这也是最终的输出
+结果. 由于每一次的合成都是多次迭代, 所以需要消耗很多时间. 合成一副图像在 cpu 条件下需要大
+概 5 个多小时 (具体还取决于图片尺寸, 优化器和模型的选择)
+   第二阶段，该论文主要是拟补第一阶段速度上的不足．该网络可以看做一个图像转换层加上一
+个失真层，其中失真层用来统计图像转换层的输出在功能和风格上的总失真．结合大量内容图片和
+一张风格图片训练，通过改变图像转换层的权值，使得失真层的输出最小, 并将最终结果存储为一
+个模型，　其可以认为是该风格的滤镜．这样一来，一张新的内容图片只需要通过该模型进行以此
+前向传播就可以得到结果．结果的细致程度可能比不上第一阶段，　但是由于只进行一次前向传播，
+耗时比较少，一般在 10 秒量级．而且，图片的效果可以通过训练数据集的选取来进行拟补．其缺点
+是，如果要生成新的模型，训练时间比较漫长．
+
+1.1.3   opencl 的兴起
+
+   opencl(Open Computing Language) 是一个开源的标准，它的目的是为了提供一个通用的接口
+使得开发人员能够更容易的让设备辅助 cpu 进行运算．
+                          设备可以使 gpu,fpga, dsp 等等．
+                                                它是又 Apple
+在 2008 年提出，并且收到 Nvidia, AMD, Intel, IBM 等巨头公司合推的一个项目．在此之前加速往
+往采用 Nvidia 的 cuda, 但是现在只要该设备支持 opencl, 就可以用来辅助计算．
+
+
+
+
+                          图 1.2 opencl 框架
+
+
+   主办方提供给我们的基于 cyclone V 的 FPGA C5P 就支持 opencl, 并且配有专门的 sdk(aocl)
+来进行编译．opencl 框架如图1.2, 使用者如果想要用其加速需要做两件事
+
+  1. 写目标机文件，就是 opencl 文件. 　其定义了 fpga 需要做哪些事．然后使用 aocl 能够直接
+    编译成 aocx 文件，　通过 aocl 提供的工具来配置 fpga.
+
+  2. 写宿主机文件，就是 cpp 文件. 其定义了宿主机如何与设备 (fpga) 进行通信. 然后依靠 sdk
+    提供的库文件, 头文件进行编译.
+
+   但是 opencl 的代码写起来过于底层, 仅仅写一个向量加的函数, 宿主机文件就需要 200 多行代
+码. 用于快速生产时, 一般采用一些高级的框架, 如表1.2
+
+
+                                2
+                     把艺术家带回家–快速风格变换系统
+
+
+
+                           名称            语言
+
+                           pyopencl      python
+                           easycl        C++
+                           cltorch       lua
+                           pipnCNN C++
+
+                         表 1.2 Opencl 高级工具介绍
+
+
+   虽然同为 opencl 设备, 但是 fpga 和 gpu 是不一样的. opencl 设备一般工作流程如下:
+
+  1. 程序启动
+
+  2. 程序初始化 gpu 设备
+
+  3. 程序加载 cl 文件
+
+  4. 程序把 cl 文件编译为中间文件, 然后传递给 gpu, 获得一个句柄函数
+
+  5. 程序通过句柄函数把数据发送给 gpu, 并且等待回传结果
+
+   对于一般的 gpu 设备, 步骤 1 到步骤 3 需要大概几秒钟, 第四步需要几秒钟, 第五步时间取决于
+数据类型和数据量对于 fpga, 第 4 步的时间将会非常的漫长, 在小时的数量级, 所以 fpga 不能采用
+实时编译的方式, 必须提前把 cl 文件编译号烧录到 fpga 中.
+   然而, 表1.2所示的前三种都主要针对 gpu 类型的 opencl 设备, 第四种虽然针对 fpga, 但是我们
+尝试编译 c5p 的时候没有编译成功.
+
+1.1.4   Movidius 神经网络加速棒的兴起
+
+   Movidius 神经计算棒是世界上第一款采用 USB 格式的 AI 加速器, 这个计算棒能够编译并加速
+边缘神经网络。而且，这款产品并不需要连接到云端，可以直接在本地实现处理。它的工作原理如
+图1.3所示. 使用者将训练好的 caffe 模型或者 tensorflow 模型用 sdk 编译, 烧录到 movidius 中. 然
+后就可以通过 sdk 提供的 api 进行加速前向传播.
+
+
+
+
+                          图 1.3 movidius 工作流程
+
+
+
+                                     3
+                           把艺术家带回家–快速风格变换系统
+
+
+    该产品目前只支持 tensorflow 和 caffe 两种深度学习框架, 并且提供了一个 docker, 里面安装了
+tensorflow,caffe 和对应 sdk(NC).
+
+
+1.2      我们要做什么
+    如1.1.2节所示，两种风格迁移的方式各有优缺点,neural-style 能够对任意的内容图片和风格图
+片进行融合, 并且非常细微, 能够输出每一步骤的结果, 但是耗时太久, 合成一张图片需要的时间在
+几个小时的数量量级. 而 fast-neural-style 能够在已经训练好模型的前提下, 能够快速的将模型对应
+的风格叠加到内容图片上, 耗时在十秒左右, 缺点是对于新的模型需要单独用大量数据进行长时间的
+训练.
+    而另一方面, 主办方提供给我们的 fpga 和 movidius 神经网络加速棒都有加速的功能, 前者能够
+加速训练, 后者能够加速前向传播的过程. 所以我们就想用加速装置来拟补两种方法的不足.
+    neural-style 能够输出每一步的结果, 那么我们就将每一步的结果合成为一个视频, 给用户展示
+一个从现实到梦幻演变的过程. 另外我们采用支持 opencl 的深度学习的架构进行训练, 利用 fpga 加
+速训练. 不过就算加速后可能也不能到达实时的效果. 但是能够大幅度等待用户的等待时间.
+    fast-neural-style 能够快速输出一张质量还不错的结果, 那么我们就预置一些精选的模型, 用户
+选择一个中意的模型后能够快速得到结果, 经过 fast-neural-style 已经能够在十几秒左右完成一次前
+向传播, 但是这对于人的体验影响依然很大, 我们采用 movidius 进行加速前向传播, 尽可能的减少时
+间, 给人以实时的感觉
+    我们的架构设计如图1.4我们在 up2 的主机上搭建服务器, 用户能够通过网页访问服务器. 有
+两种模式供用户选择, 分别是生成视频和生成图像, 本质上是选择用 neural-style 还是 fast-neural-
+style。
+
+
+
+
+                                  4
+                  把艺术家带回家–快速风格变换系统
+
+
+
+
+                       图 1.4 总体架构图
+
+
+  如果选择生成视频，那么用户上传自己的内容图片和风格图片，提交后后台就会开始利用 fpga
+进行加速训练, 当然提前要把通过 opencl 文件编译的镜像通过 aocl 工具烧录到 fpga 中。在训练的
+过程中会产生一些列图片，训练完成后会将这些图片合并为一个视频. 生成的结果保存在放在和用
+户匹配的路径下, 过一段时间用户就可以通过网页查看输出结果，可以看到一个从原来图片到目标
+图片的一个视频，并且能够自由下载相关的所有图片和视频。
+  如果选择生成图片，那么用户上传自己的内容图片并且在提供的风格类型中进行选择. 提交后
+后台就会调用对应的模型，利用 movidius 进行加速前向传播. 当然提前要把模型通过 NC 进行编译
+并且烧录进去. 输出结果会保存在和用户对应的路径下，用户可以通过网页查看输出结果并且能够
+自由下载相关图片
+
+
+1.3   我们的最终效果
+  最终, 我们实现了用户登录网页后, 通过上传内容图片和风格图片就能够得到一个视频, 通过上
+传内容图片和选择风格模型快速得到一张图片. 具体流程可以参考2.2.2节所示, 加速器方面我们实现
+了用 movidius 来加速产生图片的前线传播过程. 在使用 fpga 加速产生视频部分的时候, 还参与一些
+问题, 希望能够在评审前攻克.
+
+
+
+
+                            5
+                                把艺术家带回家–快速风格变换系统
+
+
+                   第 2 章 环境配置与 web 搭建
+2.1     环境配置
+   我们需要的环境配置如表2.1所示:
+
+        安装环境       版本                   用途
+
+        django     2.0.2(python3) 用来配置 web 端
+        tensorflow 1.7.0(python3) 作为 fast-neural-style 的框架
+        torch-cl   1.0.0-rc3            支持 opencl 的 torch 版本, 作为 neural-sytle 的框架
+        NCSDK                           用于配置 Movidius
+        Intel SDK 17.1                  用于配置 fpga
+
+                                         表 2.1 需要的安装环境
+
+
+   由于环境安装比较复杂，我们基于 ncsdk2 的 dockfile 制作了专门的镜像，托管在 dockerhub
+中，名为 lihao2333/intel. 目前版本说明如表2.2:
+
+                                   版本 说明
+
+                                   v0      tensorflow,caffe,ncsdk
+                                   v1      v0+django
+                                   v2      v1+torch-cl
+
+                               表 2.2 docerhub:lihao2333/intel 的版本说明
+
+
+   另外还需要安装 intel SDK, 我们按照手册上的说明进行了安装，为了方便使用, 我们把一些相
+关的命令进行了封装并且托管在了 github[4] 上面
+
+
+2.2     网站搭建
+2.2.1   文件管理
+
+   图2.1简略的表示了该项目的文件存储结构, 图中名称是为了表述清晰，可能与实际名称不符. 一
+些非核心文件没有表示出来。
+
+
+
+
+                                                  6
+                        把艺术家带回家–快速风格变换系统
+
+
+
+
+                               图 2.1 文件存储结构
+
+
+   其中,fast-neural-sytle 和 neural-sytle 为两个风格迁移的工程目录.
+   fast-neural-sytle 目录下的 models 文件夹存放已经训练好的模型,img 文件加存放和模型对应的
+风格图片，用于在 web 端显示. main.py 为其主执行文件。
+   neural-sytle 目录下的 models 文件夹存放基本网络架构–VGG-19 模型.main.lua 为其主执行文
+件。
+   neural_web 为 djagno 的根目录，为了能够调用两个风格迁移的主函数，需要将他们软连接到
+neural_web 下面，如虚线所示。
+     将 media 设置为 django 工程的 MEDIA_ROOT, 其下主要有三部分。
+
+     img: 为 fast-neural-style 下 img 的软链接，用于最终显示用户选择的风格图像
+
+     way_img: 保存生成图片模式下的数据，其下按照用户/时间产生文件夹作为区分，每个子文
+   件夹下保存用户上传的图像数据以及最终的结果数据
+
+     way_video: 保存生成视频模式下的数据，其下按照用户/时间产生文件夹作为区分，每个子
+   文件夹下保存用户上传的内容图片，风格图片，迭代过程中产生的结果图片以及最终产生的视
+   频
+
+2.2.2   UI 界面
+
+   图2.2所示为登陆界面，在登录后能够看到 4 个窗口，分别是 Create Video，Video gallery，Create
+Image，Image gallery，如图2.3所示.
+
+
+
+
+                                    7
+                     把艺术家带回家–快速风格变换系统
+
+
+
+
+                           图 2.2 登陆界面
+
+
+
+
+                           图 2.3 主界面
+
+
+     进入”Create Video” 后, 用户上传自己的内容图片和风格图片, 点击确定即可, 如图2.4. 用户可
+以等待也可以关闭界面. 之后点击”Video gallery” 查看产生的视频, 并且可以进行下载, 如图2.5所
+示.
+
+
+
+
+                          图 2.4 创建视频界面
+
+
+
+
+                               8
+                 把艺术家带回家–快速风格变换系统
+
+
+
+
+                     图 2.5 Video gallery 界面
+
+
+  如果想快速生成图片, 点击”Create Image”, 并且上传自己的内容图片并选择一个风格模型, 如
+图2.6所示. 稍等一会就会自动跳转浏览生成图片并且进行下载, 也可以手动点击”Image gallery” 进
+行查看. 如图2.7所示.
+
+
+
+
+                       图 2.6 创建图像界面
+
+
+
+
+                               9
+把艺术家带回家–快速风格变换系统
+
+
+
+
+   图 2.7 查看图像界面
+
+
+
+
+        10
+                      把艺术家带回家–快速风格变换系统
+
+
+              第3章          neural-sytle 产生视频
+3.1   代码说明
+  我们的这部分代码是基于 github 上 neural-sytle[6] 针对我们的需求进行改写的, 现在托管在我
+们的 github[5] 上, 主要修改体现在如下几点:
+
+  1. 去掉了 lbfgs 优化器. 改用 adam 优化器来实现, 虽然 adam 优化器的效果不如 lbfgs, 但是它
+      在节省内存, 节省时间上的优势是我们更需要的.
+
+  2. 代码重新封装. 之前作者的代码是集成在一个函数中, 我们将整个函数进行了重写, 分为若干
+      个子函数, 方便调试和管理.
+
+  3. 固化模型, 节省时间开支. 之前每一次都需要加载 vgg-19 模型, 然后修改模型, 再进行训练. 我
+      们直接将修改后的模型存储下来, 用的时候直接调用既可, 能够节省一些时间.
+
+  4. 从内容图像开始迭代. 原来的代码是从一副随机图像开始进行迭代的, 而我们的需求是以内容
+      图片为主, 所以从内容图片开始迭代, 这样能够大幅度减少迭代步数
+
+
+3.2   核心原理
+  该项目自定义了两种失真层, 分别是内容失真和图像失真, 并且将他们插入到 VGG-19 线性模
+型中. 插入的方法有很多, 我们沿用了作者在论文中提到的方法 [2].
+  如图3.1所示, 我们在 vgg-19 模型的 relu1_1,relu2_1,relu3_1,relu4_1,relu5_1 层的后面添加了
+风格失真层, 在 relu4_2 层的后面添加了内容失真层.relu1_1 的意思是 vgg-19 模型中的第一段卷积
+块的第一个卷积层后面的激活函数层.vgg-19 模型一共有 5 个卷积块, 具体模型可以参考这里 [7]
+  该代码主要有两种模式. 在 capture mode 中, 将用户的风格图片进行前行传播, 在这个过程中
+每个 sytleloss 层将风格图片到该层的输出结果作为目标值. 再将用户的内容图片进行前向传播, 在
+这个过程中每个 contentloss 层将其到该层的输出结果作为目标值.
+  在 lossmode 中, 将用户的内容图片作为前向输入, 统计其在各个失真层的总输出, 然后通过反
+向传播去更新内容图片的值. 这就是一次迭代过程, 在我们的参数下, 一幅图片大概 400 步迭代就能
+够有不错的效果.
+
+
+
+
+                                  11
+                                 把艺术家带回家–快速风格变换系统
+
+
+
+
+                                    图 3.1 neural-style 代码的两种模式
+
+
+
+3.3        主体代码结构
+      这是该项目的主函数部分代码, 为了精简, 删去了一些细节, 并且尽可能的实现友好的封装, 完
+整代码可以从我们的 github[5] 上查阅
+
+ 1   local function main(p)
+ 2         setup_device(p)-- get dtype
+ 3     setup_images(p)-- get init_image, content_image, style_image
+ 4     setup_network_1(p)-- get row network
+ 5     setup_network_2(p)-- insert loss layer
+ 6     train(p)
+ 7   end
+ 8   local p = cmd:parse(arg)
+ 9   p.output_image =
+           string.format("%s/res.%s",paths.dirname(p.content_image),paths.extname(p.content_image))
+10   main(p)
+
+
+
+     • 第二行的 setup_device 用来配置设备是否用 fpga 加速
+
+     • 第三行的 setup_images 根据输入的路径提取内容图片和风格图片, 并且最相应的图片预处理
+
+     • 第四行的 setup_network_1 用来加载 VGG-19 模型, 并且根据输入参数将对应的失真层添加
+      进去然后保存下来.
+
+
+                                                 12
+                                把艺术家带回家–快速风格变换系统
+
+
+    • 第五行的 setup_network_2 用来进行 capture mode 下的若干次前向传播, 并且记录目标值,
+      为训练做准备
+
+    • 第六行的 train 通过 adam 优化器进行训练
+
+    • 第九行是更具输入内容图片的名称对输出图片进行命名, 保证二者在同一个目录下. 这是与
+      web 端的配合
+
+其中第四行和第五行是将输出网络存储为本地文件, 第六行训练的时候直接从这个文件里提取. 所
+以对于相同的输入来说, 第四行和第五行只要执行一次就可以了, 之后可以注释掉, 这样能够大幅度
+减少调试的时间.
+
+
+3.4    API 接口
+     我们修改后的 neural-sytle_diy 提供的主要 api 以及默认值如表4.1所示
+
+名称                 默认值                                              功能
+
+content_image      contents/me.jpg                                  内容图片路径
+style_image        styles/picasso.jpg                               风格图片路径
+image_size         512                                              图片缩放规模
+backend            clnn                                             是否使用 opencl 作为加速器
+gpu                1                                                加速设备 Id, 如果是 cpu 则为-1
+init_image         contents/me.jpg                                  迭代起始点, 我们选择从内容图像开始
+proto_file         models/VGG_ILSVRC_19_layers_deploy.prototxt
+model_file         models/VGG_ILSVRC_19_layers.caffemodel
+content_weight 5e0                                                  内容失真的权重
+style_weight       20                                               风格失真的权重
+content_layers     relu4_2                                          在哪些层后面加内容失真层
+style_layers       relu1_1,relu2_1,relu3_1,relu4_1,relu5_1          在那些层后面加风格失真层
+learning_rate      1e1                                              学习率
+num_iterations 1000                                                 总共迭代步数
+print_iter         1                                                每隔多少步打印
+save_iter          1                                                每个多少步保存迭代结果
+output_image       output/out.png                                   输出图像路径
+
+                                  表 3.1 neural-style_diy 的 api 接口
+
+
+
+3.5    django 调用方式
+     用户行为本质上是上传一个包含内容图片和风格图片的 post 请求, 后台接受到 post 请求后, 先
+将图片与 user_id 绑定传入数据库, 然后调用 neural-sytle_diy 的接口. 后台处理代码如下:
+
+1   def gen_video(request):
+2       if request.method == 'POST':
+3            form = gallaryVideoForm(request.POST, request.FILES)
+
+
+                                                13
+                                 把艺术家带回家–快速风格变换系统
+
+
+ 4           if form.is_valid():
+ 5                if 'content' in request.FILES\
+ 6                        and 'style' in request.FILES:
+ 7                    content = request.FILES['content']
+ 8                    style = request.FILES['style']
+ 9                    s = gallaryVideo(owner=request.user, content=content,style=style)
+10                    s.save()
+11                    func.gen_video(s.content.path,s.style.path)
+12                    return HttpResponseRedirect("list_video")
+13           else :
+14                    return render(request, "info.html",{"info":"choose content image
+         first"})
+15
+
+16       else :
+17           return render(request,"way_video/gen_video.html",{})
+
+
+     其中第 11 行代码的 func 就是在调用 neural-sytle, 为了方便输入参数, 我们直接将命令封装在
+系统命令中, 如下所示. 第一个命令是调用模型，生成每一步的输出结果．第二个函数是通过 ffmepg
+将输出结果合并为一个视频．在每一次展示结果的时候都进行以此视频合成．
+
+ 1   def gen_video(content,style):
+ 2       cmd="cd neural-style_diy;th main.lua\
+ 3                -content_image {0} \
+ 4                -style_image {1}".format(content,style)
+ 5       os.system(cmd)
+ 6   def gen_video2(dirname):
+ 7       cmd="cd {0};pwd;ffmpeg -y -r 10 -i res_%04d.png    output.mp4; ".format(dirname)
+ 8       os.system(cmd)
+
+
+
+
+                                                   14
+                              把艺术家带回家–快速风格变换系统
+
+
+                第4章              fast-neural-style 产生图片
+4.1     核心原理
+     其原理如图4.1所示
+
+
+
+
+                                      图 4.1 fast-nerual-style 原理
+
+
+     整个网络可以视为两部分, 图形变换网络和失真网络.
+     图形变换网络是一个深度残余神经网络, 由参数 W 表征. 它将输入图像通过映射 ŷ = fW (X)
+转换为输出图像 ŷ
+     每一个失真函数通过计算 li (ŷ, yi ) 来衡量输出图片 ŷ 和目标图片 y 的差异.
+     图形变换网络通过随机梯度下降法, 以最小化总失真为目标进行训练.
+     目前采用的数据集是 COCO dataset，里面包含了大量的通用性图片．
+     训练好模型之后，输入图像 x 经过一次前向传播，经过图形变换层就能够得到输出结果. 所以
+速度非常快.
+
+
+4.2     代码结构
+4.2.1    前向传播过程
+
+     前向传播的过程比较清晰, 只需要读取图片送入 session 中运行就可以, 其中图片处理占的篇幅
+比较大, 下面的代码是省略图片处理部分的代码. 完整代码请看我们的 github[9]
+
+ 1      with tf.Graph().as_default():
+ 2          with tf.Session().as_default() as sess:
+ 3              # Read image data.
+ 4              ...
+ 5              # Add batch dimension
+ 6              ...
+ 7              # Remove batch dimension
+ 8              ...
+ 9              # Restore model variables.
+10              saver = tf.train.Saver(tf.global_variables(),
+        write_version=tf.train.SaverDef.V1)
+11              sess.run([tf.global_variables_initializer(),
+        tf.local_variables_initializer()])
+12              # Use absolute path
+
+
+                                                 15
+                                 把艺术家带回家–快速风格变换系统
+
+
+13               FLAGS.model_file = os.path.abspath(FLAGS.model_file)
+14               saver.restore(sess, FLAGS.model_file)
+15
+
+16               # Make sure 'generated' directory exists.
+17   #            generated_file = 'generated/res.jpg'
+18               generated_file = FLAGS.image_file.replace("content","res")
+19               if os.path.exists('generated') is False:
+20                    os.makedirs('generated')
+21
+
+22               # Generate and write image data to file.
+23               with open(generated_file, 'wb') as img:
+24                    img.write(sess.run(tf.image.encode_jpeg(generated)))
+25               tf.train.export_meta_graph(filename='model.meta',as_text=True)
+
+
+
+
+4.3      调用方式
+4.3.1     API 接口
+
+     fast-neural-sytle 提供的主要 api 以及默认值如表4.1所示
+
+                             名称           默认值           功能
+
+                             loss_model vgg_16          选择失真网络模型
+                             image_size 256             定义图像尺寸
+                             model_file   model.ckpt 选择风格模型
+                             image_fiel   a.jpg         选择内容图片
+
+                                  表 4.1 fast-neural-style_diy 的 api 接口
+
+
+4.3.2     django 调用 fast-neural-style
+
+     如图1.4所示，当接收到用户的 post 请求时, 后台先获取内容图片和风格模型信息，存入数据库
+后调用 fast-neural-style 的 api. 在用户请求页面展示的时候，后台通过用户 id 查询数据库，将输出
+结果呈现．产生图片的代码如下所示
+
+ 1   def gen_img(request):
+ 2       if request.method == 'POST':
+ 3           form = gallaryImgForm(request.POST, request.FILES)
+ 4           if form.is_valid():
+ 5               if 'content' in request.FILES:
+ 6                    content = request.FILES['content']
+ 7                    style = request.POST['style']
+ 8                    s = gallaryImg(owner=request.user, content=content,style=style)
+ 9                    s.save()
+10                    func.gen_img(s.content.path,s.style)
+11                    return HttpResponseRedirect("list_img")
+12           else :
+
+
+
+                                                  16
+                                把艺术家带回家–快速风格变换系统
+
+
+13                    return render(request, "info.html",{"info":"choose content image
+         first"})
+14
+
+15       else :
+16           style_list = os.listdir(os.path.join(settings.WAY_IMAGE_ROOT,"models"))
+17           return render(request,"way_img/gen_img.html",{"style_list":style_list})
+
+
+其中第十行为通过系统命令调用 fast-neural-style 接口．其代码如下所示
+
+ 1   def gen_img(content,style):
+ 2       cmd="python3 fast-neural-style-tensorflow/eval.py\
+ 3                --image_file {0} \
+ 4                --model_file fast-neural-style-tensorflow/models/{1}".format(content,style)
+
+
+查看图片的代码如下所示
+
+ 1   def list_img(request):
+ 2       model = gallaryImg.objects.get(owner=request.user)
+ 3       print(model.style)
+ 4       content = {"content_url":model.content.url,
+ 5
+
+         "style_url":settings.MEDIA_URL+"img/%s"%model.style.replace("ckpt-done","jpg"),
+ 6                    "res_url":model.content.url.replace('content','res')}
+ 7       return render(request,"way_img/list_img.html",content)
+
+
+
+
+                                                 17
+                      把艺术家带回家–快速风格变换系统
+
+
+                       第 5 章 加速设备
+5.1     fpga 加速训练过程
+5.1.1   opencl 框架
+
+   如1.1.3节所介绍的，要实现 opencl 设备加速，要从宿主机和目标机两方面分别入手．尤其是对
+于 fpga 来说, 不能够做到实时编译, 需要采用离线模式.
+
+5.1.2   如何配置 fpga
+
+   最终目标是要把需要 fpga 做的工作用 opencl 语言表达, 然后通过 intel 提供的交叉编译工具编
+译成 aocx 文件, 烧录到 fpga 中. 具体的操作流程可以参考 [8] 其关键步骤如下:
+
+  1. install board 将成 c5p 配套资源和 sdk 仪器安装到宿主机, 并且配置好环境变量以及相关
+      权限
+
+  2. compile kernel 将 opencl 文件 (里面包含了所有 kernel 函数的信息) 编译成 aocx 镜像文件
+
+  3. flash 利用编译好的 aocx 文件, 将自启动镜像烧录到 fpga 中. 通过重启 fpga, 使其自动执行
+      镜像进入 opencl 模式. 在该模式下,PCIE 端口能够被宿主机所检测到
+
+  4. program 将 aocx 中的所有信息烧录进 fpga 中, 完成 fpga 的配置
+
+   我们将其中的一些常用命令进行了封装, 托管在我们的 github[4] 可以提高开发的效率.
+   通过 intel 提供的 sdk, 我们可以很方便的完成 opencl 文件的烧录, 核心在于如何编写 cl 文件
+
+5.1.3   cltorch
+
+   cltorch 是 torch 的一个发行版, 其在支持大部分 torch 的功能, 并且提供对 opencl 设备的支持.
+其本是为了支持 opencl 的 gpu 而设计的, 但是基于它提供的 cl 文件, 我们也可以实现对 fpga 的支
+持. 具体步骤如下:
+
+  1. 根据 cltorch 提供的 cl 文件, 参照5.1.1节的过程, 配置好 fpga
+
+  2. 将相关的库文件换成 intel sdk 提供的库文件
+
+  3. 利用 setDevice 函数配置加速设备, 并且将 dtype 设置为”torch.ClTensor”
+
+之后的代码就按照原先的写法既可. 到目前为止, 我们配置好 fpga 后, 还不能够被 cltorch 检测到,
+问题应该是出在替换为 intel 库文件这一步. 我们在咨询技术部的时候, 也知道 intel 的 opencl 相对
+于通用的 opencl 有一定的局限性. 我们寄希望与在评审前将这一环节打通.
+
+
+5.2     movidius 加速前向传播过程
+5.2.1   修改源代码
+
+   如1.1.4节所示，要实现 movidius 设备加速, 需要将模型编译成需要的格式. 但是因为只是让
+movidius 做推理部分的工作, 所以需要对原先的评估代码做修改, 只保留它的推理部分代码. 具体修
+要修改的工作如下:
+
+
+                                  18
+                                把艺术家带回家–快速风格变换系统
+
+
+     1. 删除 dropout 层
+
+     2. 删除数据导入读取部分个代码
+
+     3. 删除计算损失函数部分的代码
+
+     4. 删除除了输入层之外的所有 placeholder
+
+然后添加 Saver 类, 导出一个 meta 文件既可.
+     本项目修改后的版本托管在我们 github[9] 上
+
+5.2.2     模型编译
+
+     首先准备训练好的 tensorflow 模型，利用 movidius 自带的工具 mvNCCheck，将 tensorflow 模
+型中的.meta 文件转换成 ncs 适用的 graph 文件通过如下命令可以实现:
+
+ 1   mvNCCompile wave.meta -s 12 -in input -on output wave.graph
+
+
+其中-in 和-on 分别指定了输入层和输出层所对应的 placeholder, 需要和代码中的名称匹配
+
+5.2.3     顶层通信文件
+
+     顶层通信代码主要包含以下几点：
+     1. 寻找 ncs 设备：
+
+ 1
+
+ 2      # ---- Step 1: Open the enumerated device and get a handle to it -------------
+ 3
+
+ 4      mvnc.global_set_option(mvnc.GlobalOption.RW_LOG_LEVEL, 2)
+ 5      # Look for enumerated NCS device(s); quit program if none found.
+ 6      devices = mvnc.enumerate_devices()
+ 7      if len(devices) == 0:
+ 8          print("No devices found")
+ 9          quit()
+10
+
+11      # Get a handle to the first enumerated device and open it
+12      device = mvnc.Device(devices[0])
+13      device.open()
+
+
+2. 将之前转换好的 graph 文件导入到 ncs 设备中，为接下来的神经网络运行做好准备：
+
+ 1      # ---- Step 2: Load a graph file onto the NCS device -------------------------
+ 2
+
+ 3      # Read the graph file into a buffer
+ 4      with open(GRAPH_PATH, mode='rb') as f:
+ 5          blob = f.read()
+ 6
+
+ 7      # Load the graph buffer into the NCS
+ 8      graph = mvnc.Graph("graph1")
+ 9
+
+
+
+
+                                                 19
+                              把艺术家带回家–快速风格变换系统
+
+
+10   fifoIn, fifoOut = graph.allocate_with_fifos(
+11         device, blob, input_fifo_num_elem=2)
+
+
+3. 处理图片，将输入的图片处理成 tensorflow 需要的格式：
+
+ 1   # ---- Step 3: Pre-process the images ----------------------------------------
+ 2
+
+ 3   # Resize image [Image size is defined during training]
+ 4
+
+ 5   img_c = print_img = skimage.io.imread(CONTENT_PATH)
+ 6   img_c = skimage.transform.resize(img_c, IMAGE_DIM, preserve_range=True)
+ 7   # Convert RGB to BGR [skimage reads image in RGB, some networks may need BGR]
+ 8   ...
+ 9
+
+10   # Mean subtraction & scaling [A common technique used to center the data]
+11   img_c = img_c.astype(numpy.float32)
+
+
+4. 将处理好的图片发送到 ncs 中，获取输出的结果
+
+ 1   # ---- Step 4: Read & print inference results from the NCS -------------------
+ 2
+
+ 3   # The first inference takes an additional ~20ms due to memory
+ 4   # initializations, so we make a 'dummy forward pass'.
+ 5
+
+ 6   graph.queue_inference_with_fifo_elem(fifoIn, fifoOut, img_c, '-c')
+ 7
+
+ 8   output, userobj = fifoOut.read_elem()
+ 9   #handle the result
+10   ...
+
+
+
+
+                                                  20
+                               把艺术家带回家–快速风格变换系统
+
+
+                                        参考文献
+[1] fast-neural-style-tensorflow,https://github.com/hzy46/fast-neural-style-tensorflow
+
+[2] A Neural Algorithm of Artistic Style,Leon A. Gatys, Alexander S. Ecker, Matthias Bethge,
+   https://arxiv.org/abs/1508.06576
+
+[3] Perceptual Losses for Real-Time Style Transfer and Super-Resolution,Justin Johnson, Alexandre
+   Alahi, Li Fei-Fei,Department of Computer Science, Stanford University,https://arxiv.org/
+   pdf/1603.08155v1.pdf
+
+[4] https://github.com/lihao2333/rcClub/tree/root%40upsquared
+
+[5] https://github.com/lihao2333/neural-style-diy
+
+[6] https://github.com/jcjohnson/neural-style
+
+[7] https://www.kaggle.com/keras/vgg19
+
+[8] https://www.altera.com/un_US/pdfs/literature/hb/opencl-sdk/aocl_getting_
+   started.pdf
+
+[9] https://github.com/lihao2333/fast-neural-style-tensorflow
+
+
+
+
+                                               21
+
