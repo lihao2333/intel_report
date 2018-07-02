@@ -1,0 +1,81 @@
+\section{系统原理}
+\subsection{利用neural-style产生视频}
+我们基于\url{https://github.com/jcjohnson/neural-style}的代码,结合我们的需求进行了修改,托管在\url{https://github.com/lihao2333/neural-style-diy}
+
+该方法自定义了两种失真层,分别是内容失真和图像失真.
+
+网络结构如图\ref{fig:neural-style-flow}所示,在vgg-19模型的relu1\_1,relu2\_1,relu3\_1,relu4\_1,relu5\_1层的后面添加了风格失真层,在relu4\_2层的后面添加了内容失真层.
+
+该代码主要有两种模式. 在capture mode中,将风格图片进行前行传播,在这个过程中每个sytleloss层将风格图片到该层的输出结果作为目标值.再将用户的内容图片进行前向传播,在这个过程中每个contentloss层将其到该层的输出结果作为目标值.
+
+在lossmode中, 将用户的内容图片作为前向输入, 统计其在各个失真层的总输出,然后通过反向传播去更新内容图片的值.通过不断迭代改过程既可输出内容和风格融合的图片
+
+通过ffmpeg工具,可以将每一次迭代输出的图片合成为一个视频.
+\addfig[0.9]{neural-style-flow.jpg}{fig:neural-style-flow}{neural-style代码的两种模式}
+\subsection{利用fast-neural-style快速产生图片}
+我们基于\url{https://github.com/hzy46/fast-neural-style-tensorflow}的代码,结合我们的需求进行了修改,托管在\url{https://github.com/lihao2333/fast-neural-style-tensorflow}
+
+其原理如图\ref{fig:fast-neural-style-principle}所示
+\addfig[0.8]{fast-neural-style-principle.png}{fig:fast-neural-style-principle}{fast-nerual-style原理}
+整个网络可以视为两部分,图形变换网络和失真网络.
+
+图形变换网络是一个深度残余神经网络,由参数$W$表征.它将输入图像通过映射$\hat y=f_W(X)$转换为输出图像$\hat y$
+
+每一个失真函数通过计算$l_i(\hat y,y_i)$来衡量输出图片$\hat y$和目标图片$y$的差异.
+
+图形变换网络通过随机梯度下降法,以最小化总失真为目标,以COCO为数据集进行训练.
+
+训练好模型之后，输入图像$x$经过一次前向传播，经过图形变换层就能够得到输出结果,所以速度非常快.
+
+\subsection{利用opencl加速训练}
+cyclone V 是支持opencl的fpga,我们希望它能够加速用neural-sytle产生视频时的训练过程.
+
+cltorch是torch的一个分支,它在支持opencl设备的同时支持大部分torch的功能.
+
+但是由于它是针对opencl gpu设备设计的,对于fpga来说,会有很大的不同.
+我们需要将cl文件提前编译烧录到fpga中,而不能够采用实时编译的方法.
+我门需要做的工作如下:
+\begin{enumerate}
+  \item 将cl文件用aocl工具编译并烧录到fpga中
+  \item 用intel提供的库去替换cltorch中的库并且解决他们之间的冲突
+\end{enumerate}
+
+\subsection{利用movidius加速前向传播}
+movidius 能够加速前向传播过程,所以我们用它来加速fast-nerual-style产生图片的过程.
+
+movidius提供的api能够编译tensorflow模型使其被movidius调用.
+
+我们需要做的工作如下:
+\begin{enumerate}
+  \item 修改原先代码,使得其只有推理层,并且指定对应的输入输出层
+  \item 改写调用配置文件,主要包括输入输出的参数
+\end{enumerate}
+
+\section{实现}	
+
+我们的架构设计如图\ref{fig:top}我们在up2的主机上搭建服务器,用户能够通过网页访问服务器. 
+有两种模式供用户选择,分别是生成视频和生成图像, 本质上是选择用neural-style还是fast-neural-style。
+\addfig[0.9]{top.jpg}{fig:top}{总体架构图}
+
+如果选择生成视频， 那么用户上传自己的内容图片和风格图片，
+提交后后台就会开始利用fpga进行加速训练,当然提前要把通过opencl文件编译的镜像通过aocl工具烧录到fpga中。
+在训练的过程中会产生一些列图片，训练完成后会将这些图片合并为一个视频.
+生成的结果保存在放在和用户匹配的路径下, 过一段时间用户就可以通过网页查看输出结果，
+可以看到一个从原来图片到目标图片的一个视频，并且能够自由下载相关的所有图片和视频。
+
+如果选择生成图片，那么用户上传自己的内容图片并且在提供的风格类型中进行选择.
+提交后后台就会调用对应的模型，利用movidius进行加速前向传播.当然提前要把模型通过NC进行编译并且烧录进去.
+输出结果会保存在和用户对应的路径下，用户可以通过网页查看输出结果并且能够自由下载相关图片
+
+整体网络框架完全是我们自己完成,托管在\url{https://github.com/lihao2333/neural_web}
+
+\section{测试效果}	
+\subsection{产生视频}
+如图\ref{fig:gen-video}用户上传自己的内容图片和风格图片后,等一段时间即可查看自己的视频,如图\ref{fig:show-video}
+另外,如果目标是训练400步,当训练了200步时查看,就会显示前200步的合成视频,不必等完全训练完再进行查看.
+\addfig[0.9]{gen-video.png}{fig:gen-video}{创建视频界面}
+\addfig[0.9]{show-video.png}{fig:show-video}{Video gallery界面}
+\subsection{产生图片}
+如图\ref{fig:gen-img}用户上传自己的内容图片并且选择风格模型后,等几秒钟就可以查看自己的生成图片,如图\ref{fig:show-img}
+\addfig[0.9]{gen-img.png}{fig:gen-img}{创建图像界面}
+\addfig[0.9]{show-img.png}{fig:show-img}{查看图像界面}

@@ -1,0 +1,18 @@
+\centerline{\bfseries\zihao{3} AINASCERE GALLERY}
+\centerline{\bfseries\zihao{3} FAST SYTLE TRANSFORMATION SYSTEM}
+\section*{\zihao{2} \centering \textbf{Abstract} }
+   %用了Times New Roman字体来美化观感
+
+Our project is based on an assumption that people want their photos to be different and have their own characteristics.
+At present, there are two ways to realize image style migration by deep learning. The first one is to use the content picture and the style picture to set the target value, and then iterate from a random point to approach the target value. The second is to select a style picture and train it into a model through a large number of content picture sets, so that the new content picture can be outputted by forward propagation.
+There are advantages and disadvantages in both methods. The former has a good effect, and each step has an output, but the time is long. Although the latter is fast, it is necessary to train the model in advance for the style picture.
+We hope to use the Intel cp5 fpga that supports opencl to accelerate the iterative process of the former, and use the Intel Movidius to accelerate the forward propagation process of the latter, and at the same time, integrate the output of each step of the former into a video.
+
+Finally, when the user logs in to the webpage, he can upload a style image and content image to get a video from the original image to the target image. Users can also upload a content image and select a preset style model to quickly generate a style migration image. The former gives a sense of reality, the latter gives a sense of dreaminess.
+
+\textbf{Key Words:} style transfer, fast style transfer, fpga accelerate, movidius,individuation,opencl,intel
+\addcontentsline{toc}{section}{Abstract}
+
+
+
+
