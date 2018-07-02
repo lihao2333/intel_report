@@ -1,0 +1,76 @@
+\section{System principle}
+\subsection{Generate videos with neural-style}
+Our code was based on \url{https://github.com/jcjohnson/neural-style}, combined with our requirements. We put it on Github: \url{https://github.com/lihao2333/neural-style-diy}
+
+This method defines two distortion layers, which are content distortion and image distortion.
+
+Network structure as shown in the figure\ref{fig:neural-style-flow}. In the vgg-19 model, we add style distortion layer behind relu1\_1,relu2\_1,relu3\_1,relu4\_1,relu5\_1, add the content distortion layer behind relu4\_2.
+
+There are two main modes of the code. In the capture mode, the style picture is forwarded. In this process, each styleloss layer takes the output result of the style picture to the layer as the target value. Then the user's content picture is processed. To the propagation, in this process each contentloss layer takes its output to that layer as the target value.
+
+In lossmode, the user's content image is taken as the forward input, and the total output in each distortion layer is counted, and then the value of the content image is updated by back-propagation. By continuously iteratively changing the process, both content and style-fused images can be output.
+
+With the ffmpeg tool, you can synthesize the images output by each iteration into a single video.
+\addfig[0.9]{neural-style-flow.jpg}{fig:neural-style-flow}{Two mods of neural-style code}
+\subsection{Quickly generate images with fast-neural-style}
+Our code was based on\url{https://github.com/hzy46/fast-neural-style-tensorflow}combined with our requirements. We put it on Github\url{https://github.com/lihao2333/fast-neural-style-tensorflow}
+
+The principle is as figure \ref{fig:fast-neural-style-principle} shown.
+\addfig[0.8]{fast-neural-style-principle.png}{fig:fast-neural-style-principle}{The principle of fast-nerual-style}
+The entire network can be viewed as two parts, a graphical transformation network and a distorted network.
+The graphics transformation network is a deep residual neural network characterized by the parameter $W$. It converts the input image into the output image $\hat y$ by mapping $\hat y=f_W(X)$
+
+Each distortion function measures the difference between the output image $\hat y$ and the target image $y$ by calculating $l_i(\hat y,y_i)$.
+
+The graphic transformation network uses the stochastic gradient descent method to minimize the total distortion and uses COCO data set for training.
+
+After training the model, the input image $x$ is forwarded once, and the result can be obtained through the graphic transformation layer, so the speed is very fast.
+
+\subsection{Accelerate training with Opencl}
+Cyclone V is fpga that supports opencl and we hope it will speed up the training process when using neural-sytle to generate video.
+
+Cltorch is a branch of torch that supports most of the torch functions while supporting Opencl devices.
+
+Since it is designed for opencl gpu devices, there would be great differences for fpga.
+We need to compile and burn the cl file to fpga in advance, and we can't use the real-time compilation method.
+We have to do two works as follows:
+\begin{enumerate}
+  \item The cl file is compiled with aocl tool and burned into fpga
+  \item Use the library provided by Intel to replace the library in cltorch and resolve the conflict between them.
+\end{enumerate}
+
+\subsection{Speed up forward propagation with Moveidius}
+We speed up the process of fast-nerual-style production of pictures with Movidius, because it can speed forward the propagation process.
+
+The API provided by Movidius can compile the tensorflow model to be called by Movidius.
+
+We have to do some task as follows:
+\begin{enumerate}
+  \item Modify the original code so that it only has the inference layer and specify the corresponding input and output layer
+  \item Rewrite the calling configuration file, mainly including input and output parameters
+\end{enumerate}
+
+\section{Realization}
+
+Our architecture design is shown in figure \ref{fig:top}. We set up the server on the host of Up2, and the user can access the server through the webpages.
+There are two modes for the user to choose from, which are to generate video and generate images. In essence, it is to choose neural-style or fast-neural-style.
+\addfig[0.9]{top.jpg}{fig:top}{Architecture}
+
+If users choose to generate a video, they could upload a content image and a style image.
+After the submission, the background will begin to use fpga for acceleration training. It is worth mentioning that the image compiled by the Opencl file must be burned to fpga by the aocl tool in advance.
+During the training process, a series of pictures will be generated. After the training is completed, these pictures will be combined into a video.
+The generated results are saved in a path that matches the user. After a while, the user can view the output through the web page.
+They can see a video from the original picture to the target picture, and you can freely download all related pictures and videos.
+
+The overall network framework is completely our own, hosted on\url{https://github.com/lihao2333/neural_web}
+
+\section{Test effect}
+\subsection{Generate video}
+As the figure \ref{fig:gen-video} shown, After users upload their own content images and style pictures, wait for a while, they can view the videos. As figure \ref{fig:show-video}.
+In addition, if the goal is to train 400 steps, when viewed after training 200 steps, the first 200 steps of the composite video will be displayed, do not have to wait until fully trained to view.
+\addfig[0.9]{gen-video.png}{fig:gen-video}{Create video interface}
+\addfig[0.9]{show-video.png}{fig:show-video}{Video gallery interface}
+\subsection{Generate a picture}
+Pictured \ref{fig:gen-img}After the users upload a content image and select the style model, they can view their own generated image in a few seconds, as shown in the figure \ref{fig:show-img}.
+\addfig[0.9]{gen-img.png}{fig:gen-img}{Create an image interface}
+\addfig[0.9]{show-img.png}{fig:show-img}{View an image interface}

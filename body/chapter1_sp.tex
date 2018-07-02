@@ -6,7 +6,7 @@
 
 网络结构如图\ref{fig:neural-style-flow}所示,在vgg-19模型的relu1\_1,relu2\_1,relu3\_1,relu4\_1,relu5\_1层的后面添加了风格失真层,在relu4\_2层的后面添加了内容失真层.
 
-该代码主要有两种模式. 在capture mode中,将风格图片进行前行传播,在这个过程中每个sytleloss层将风格图片到该层的输出结果作为目标值.再将用户的内容图片进行前向传播,在这个过程中每个contentloss层将其到该层的输出结果作为目标值.
+该代码主要有两种模式. 在capture mode中,将风格图片进行前行传播,在这个过程中每个styleloss层将风格图片到该层的输出结果作为目标值.再将用户的内容图片进行前向传播,在这个过程中每个contentloss层将其到该层的输出结果作为目标值.
 
 在lossmode中, 将用户的内容图片作为前向输入, 统计其在各个失真层的总输出,然后通过反向传播去更新内容图片的值.通过不断迭代改过程既可输出内容和风格融合的图片
 
@@ -27,23 +27,23 @@
 
 训练好模型之后，输入图像$x$经过一次前向传播，经过图形变换层就能够得到输出结果,所以速度非常快.
 
-\subsection{利用opencl加速训练}
-cyclone V 是支持opencl的fpga,我们希望它能够加速用neural-sytle产生视频时的训练过程.
+\subsection{利用Opencl加速训练}
+cyclone V 是支持Opencl的fpga,我们希望它能够加速用neural-sytle产生视频时的训练过程.
 
 cltorch是torch的一个分支,它在支持opencl设备的同时支持大部分torch的功能.
 
 但是由于它是针对opencl gpu设备设计的,对于fpga来说,会有很大的不同.
 我们需要将cl文件提前编译烧录到fpga中,而不能够采用实时编译的方法.
-我门需要做的工作如下:
+我们需要做的工作如下:
 \begin{enumerate}
   \item 将cl文件用aocl工具编译并烧录到fpga中
-  \item 用intel提供的库去替换cltorch中的库并且解决他们之间的冲突
+  \item 用Intel提供的库去替换cltorch中的库并且解决他们之间的冲突
 \end{enumerate}
 
-\subsection{利用movidius加速前向传播}
-movidius 能够加速前向传播过程,所以我们用它来加速fast-nerual-style产生图片的过程.
+\subsection{利用Movidius加速前向传播}
+Movidius 能够加速前向传播过程,所以我们用它来加速fast-nerual-style产生图片的过程.
 
-movidius提供的api能够编译tensorflow模型使其被movidius调用.
+Movidius提供的API能够编译tensorflow模型使其被movidius调用.
 
 我们需要做的工作如下:
 \begin{enumerate}
@@ -51,9 +51,9 @@ movidius提供的api能够编译tensorflow模型使其被movidius调用.
   \item 改写调用配置文件,主要包括输入输出的参数
 \end{enumerate}
 
-\section{实现}	
+\section{实现}
 
-我们的架构设计如图\ref{fig:top}我们在up2的主机上搭建服务器,用户能够通过网页访问服务器. 
+我们的架构设计如图\ref{fig:top}我们在up2的主机上搭建服务器,用户能够通过网页访问服务器.
 有两种模式供用户选择,分别是生成视频和生成图像, 本质上是选择用neural-style还是fast-neural-style。
 \addfig[0.9]{top.jpg}{fig:top}{总体架构图}
 
@@ -69,7 +69,7 @@ movidius提供的api能够编译tensorflow模型使其被movidius调用.
 
 整体网络框架完全是我们自己完成,托管在\url{https://github.com/lihao2333/neural_web}
 
-\section{测试效果}	
+\section{测试效果}
 \subsection{产生视频}
 如图\ref{fig:gen-video}用户上传自己的内容图片和风格图片后,等一段时间即可查看自己的视频,如图\ref{fig:show-video}
 另外,如果目标是训练400步,当训练了200步时查看,就会显示前200步的合成视频,不必等完全训练完再进行查看.
